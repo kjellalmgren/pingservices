@@ -21,22 +21,10 @@
 	
 
 	
-	$ docker-compose scale server=2
-		Stopping and removing server_server_3 ... done
-		Stopping and removing server_server_4 ... done
-	
 	$ docker-compose stop
 	# stop all services
 	$ docker-compose rm		#will remove all running services
 	
-
-	$ docker images
-		REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-		server_web          latest              95f750d73235        40 minutes ago      717 MB
-		server              latest              bbfb03d3c251        2 hours ago         708 MB
-		golang              onbuild             ad323f40f596        2 weeks ago         703 MB
-		golang              1.8                 c0ccf5f2c036        2 weeks ago         703 MB
-		# server_web can be removed
 	
 
 ##stop container
@@ -52,11 +40,12 @@
 ##Images
     #list all images
 	$ docker images
-	# remove image (rmi)
+	# remove images
 	$ docker rmi <IMAGE ID> 
 
 ##remove all stopped containers
 	$ docker rm $(docker ps -q -f status=exited)
+
 ##Entirely wipe out all containers
 	$ docker rm $(docker ps -a -q)
 	
@@ -76,7 +65,7 @@
 	
 To build it manually run this command to build it. 
 
-	$ docker build -f Dockerfile.production -t server:latest .
+	$ docker build -f Dockerfile.production -t pingservices:2.14 .
 	
 	
 ##Docker Comparing Containers and Virtual Machines
@@ -94,11 +83,11 @@ To build it manually run this command to build it.
 
 	# We need to compile for 32 bits armv7
 	$ GOOS=linux GOARCH=arm GOARM=7 go build -v
-	$ file server
+	$ file pingservices
 	
 	# server: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), statically linked, not stripped
 	
-	$ docker build --file Dockerfile.production -t server .
+	$ docker build --file Dockerfile.production -t pingservices .
 	
 ##Dockerfile.production
 	
@@ -106,7 +95,7 @@ To build it manually run this command to build it.
 	#FROM scratch
 	FROM scratch
 	# copy our static linked library
-	COPY server server
+	ADD pingservices /pingservices 
 	
 	# compile static linked binary
 	$ GOOS=linux GOARCH=arm go build -a --ldflags '-extldflags "static"' -tags pingservices -installsuffix pingservices .
@@ -114,18 +103,17 @@ To build it manually run this command to build it.
 	EXPOSE 8080
 
 	# run it!
-	CMD ["./server"]
+	CMD ["./pingservices"]
 	#
-	$ docker tag server tetracon/server:srv
-	$ docker push tetracon/server
+	$ docker tag server tetracon/pingservices:2.14
+	$ docker push tetracon/pingservices:2.14
 	#if pulled from docker hub
-	$ docker pull tetracon/server:srv
+	$ docker pull tetracon/pingservices:2.14
 	
 ##On Raspberry PI2
 
 	HypriotOS/armv7: pirate@black-pearl in ~
-	$ docker run --publish 8081:8080 srv -t tetracon/server:srv
-	
+	$ docker run --publish 8081:8080 srv -t tetracon/pingservices:2.14
 
 ##Docker swarm visualizer
 	
@@ -143,9 +131,6 @@ Should be run in the swarm manager, remember to login to hub.docker.com
   	alexellis2/visualizer-arm:latest
   	
   	<!-- -->
-  	
--
-	<!-- -->
 	
 	$ docker ps viz
 	$ docker service ls
@@ -159,7 +144,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	# build with tag pingservices (-t=tag)
 	$ docker build --file Dockerfile.builder -t tetracon/pingservices:2.14 .
 	# new from here
-	$ docker login
+	$ docker login (add credentials)
 	$ # docker tag pingservices tetracon/pingservices:2.14
 	# push image to repository
 	$ docker push tetracon/pingservices:2.14
