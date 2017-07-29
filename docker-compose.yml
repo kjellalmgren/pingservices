@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  web:
+    image: tetracon/pingservices:2.12
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "80:9000"
+    networks:
+      - webnet
+networks:
+  webnet:
