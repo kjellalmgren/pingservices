@@ -5,7 +5,7 @@ FROM scratch
 COPY pingservices pingservices
 
 # tell we are exposing our service on port 8080
-EXPOSE 8080
+EXPOSE 9000
 
 # run it!
 CMD ["./pingservices"] 
