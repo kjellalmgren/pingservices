@@ -1,4 +1,4 @@
-#Project Docker container on raspberry 3 cluster
+#Project Docker container on raspberry PI 3 cluster
 
 We need to update this documentation 2017-07-29 Kjell Almgren
 
@@ -6,31 +6,11 @@ We need to update this documentation 2017-07-29 Kjell Almgren
 	$ # not nessecary if you use docker-compose.yml
 	$ docker run --publish 8443:8443 --name pingservices -t pingservices
 
-#run as service via docker-compose
-
-##Build docker image
-	# build with tag server (-t=tag)
-	$ docker build --file Dockerfile.builder -t server .
-	# new from here
-	$ docker login
-	$ docker tag server tetracon/golang:srv
-	$ docker push tetracon/golang:srv	
-	$ docker run -p4000:8080 tetracon/golang:srv
-	
-
-	
-	$ docker-compose stop
-	# stop all services
-	$ docker-compose rm		#will remove all running services
-	
-	
-
 ##stop container
 	$ docker stop <CONTAINER ID>
 	$ docker ps	# list running container with CONTAINER ID
 	$ docker ps -all # list all container (for rm)
 	$ docker stats <CONTAINER ID>
-	
 	
 ##remove container
 	$ docker rm <CONTAINER ID>
@@ -47,20 +27,75 @@ We need to update this documentation 2017-07-29 Kjell Almgren
 ##Entirely wipe out all containers
 	$ docker rm $(docker ps -a -q)
 	
-###Dockerfile.production
+#Dockerfile.builder
 
-	# start with a scratch (no layers)
-	FROM scratch
+    # start from hypriot/rpi-alpine-scratch (nginx:alpine)
+    #
+    # -------------------------------------------------
+    # FROM scratch
+    # MAINTAINER kjell.almgren@tetracon.se
+    # ADD pingservices /pingservices
+    # ENTRYPOINT ["/pingservices"] 
+    #
+    # -------------------------------------------------
+    FROM resin/rpi-raspbian
 
-	# copy our static linked library
-	COPY server server
+    MAINTAINER kjell.almgren@tetracon.se
 
-	# tell we are exposing our service on port 8080
-	EXPOSE 8080
+    # make some update to the OS in the container
+    #RUN apk update && \
+    #apk upgrade && \
+    #apk add bash && \
+    #rm -rf /var/cache/apk/*
 
-	# run it!
-	CMD ["./pingservices"]
-	
+    #make some changes to the container images (docker dns-bugs)
+    #COPY docker-compose.yml docker-compose.yaml
+    #switch to our app directory (/pingservices)
+    RUN mkdir -p /pingservices
+    WORKDIR /pingservices
+
+    #create our sub directories
+    RUN mkdir -p dist/css/
+    RUN mkdir -p dist/fonts
+    RUN mkdir -p dist/js
+    RUN mkdir -p images
+    RUN mkdir -p templates
+    RUN mkdir -p assets/js/vendor
+
+    #copy distributions files
+    COPY dist/css dist/css
+    COPY dist/fonts dist/fonts
+    COPY dist/js dist/js
+
+    #COPY images files
+    COPY images images
+
+    #vendor files
+    COPY assets assets
+    COPY assets/js assets/js
+    COPY assets/js/vendor assets/js/vendor
+
+    #copy main template files
+    COPY templates templates
+
+    #copy the main services
+    COPY main.css main.css
+    COPY services-prod.json services-prod.json
+    COPY services-qa.json services-qa.json
+    # COPY pingservices pingservices
+    ADD pingservices /pingservices
+
+    # copy our self-signed certificate for now
+    ##COPY tetracon-server.crt /go/src/server
+    ##COPY tetracon-server.key /go/src/server
+
+    # tell we are exposing our service on port 9000
+    EXPOSE 9000
+
+    # run it!
+    CMD ["./pingservices"]
+    #ENTRYPOINT ["/pingservices"]
+
 To build it manually run this command to build it. 
 
 	$ docker build -f Dockerfile.production -t pingservices:2.14 .
@@ -87,21 +122,7 @@ To build it manually run this command to build it.
 	
 	$ docker build --file Dockerfile.production -t pingservices .
 	
-##Dockerfile.production
 	
-	# start with a scratch (no layers)
-	#FROM scratch
-	FROM scratch
-	# copy our static linked library
-	ADD pingservices /pingservices 
-	
-	# compile static linked binary
-	$ GOOS=linux GOARCH=arm64 go build -a --ldflags '-extldflags "static"' -tags pingservices -installsuffix pingservices .
-	# tell we are exposing our service on port 8080
-	EXPOSE 8080
-
-	# run it!
-	CMD ["./pingservices"]
 	#
 	$ docker tag server tetracon/pingservices:2.14
 	$ docker push tetracon/pingservices:2.14
