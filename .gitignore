@@ -18,6 +18,6 @@ services-bkup.json
 services-qa.json
 services-prod.json
 #images
-/images/logotype.png
+/images/logotyp.png
 #executable
 pingservices
