@@ -1,8 +1,6 @@
-#Docker container
+#Project Docker container on raspberry 3 cluster
 
-## Docker test versions
-
-	$ curl -fsSL https:test.docker.com/| sh #pipe character alt-7 on OSX
+We need to update this documentation 2017-07-29 Kjell Almgren
 
 ##docker run images
 	$ # not nessecary if you use docker-compose.yml
@@ -61,7 +59,7 @@
 	EXPOSE 8080
 
 	# run it!
-	CMD ["./server"]
+	CMD ["./pingservices"]
 	
 To build it manually run this command to build it. 
 
@@ -72,20 +70,20 @@ To build it manually run this command to build it.
 
 	http://www.docker.com/what-docker
 	
-##dock tutorial repro
+##docker tutorial repro
 
 	1. https://docs.docker.com/get-started/#container-diagram
 	2. https://docs.docker.com/get-started/part2/#conclusion-of-part-one
 	3. https://docs.docker.com/get-started/part3/#understanding-services
 	4. 
 
-#Docker on Raspberry PI2
+#Docker on Raspberry PI3
 
-	# We need to compile for 32 bits armv7
-	$ GOOS=linux GOARCH=arm GOARM=7 go build -v
+	# We need to compile for 64 bits armv8
+	$ GOOS=linux GOARCH=arm64 go build -v
 	$ file pingservices
 	
-	# server: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), statically linked, not stripped
+	# pingservices: ELF 64-bit LSB executable, ARM aarch64, version 1 (SYSV), statically linked, stripped
 	
 	$ docker build --file Dockerfile.production -t pingservices .
 	
@@ -98,7 +96,7 @@ To build it manually run this command to build it.
 	ADD pingservices /pingservices 
 	
 	# compile static linked binary
-	$ GOOS=linux GOARCH=arm go build -a --ldflags '-extldflags "static"' -tags pingservices -installsuffix pingservices .
+	$ GOOS=linux GOARCH=arm64 go build -a --ldflags '-extldflags "static"' -tags pingservices -installsuffix pingservices .
 	# tell we are exposing our service on port 8080
 	EXPOSE 8080
 
@@ -110,11 +108,6 @@ To build it manually run this command to build it.
 	#if pulled from docker hub
 	$ docker pull tetracon/pingservices:2.14
 	
-##On Raspberry PI2
-
-	HypriotOS/armv7: pirate@black-pearl in ~
-	$ docker run --publish 8081:8080 srv -t tetracon/pingservices:2.14
-
 ##Docker swarm visualizer
 	
 https://github.com/dockersamples/docker-swarm-visualizer
@@ -131,7 +124,8 @@ Should be run in the swarm manager, remember to login to hub.docker.com
   	alexellis2/visualizer-arm:latest
   	
   	<!-- -->
-	
+
+    #command to be used for viz
 	$ docker ps viz
 	$ docker service ls
 	$ docker node inspect self #find out ip-adress for manager
@@ -145,7 +139,6 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	$ docker build --file Dockerfile.builder -t tetracon/pingservices:2.14 .
 	# new from here
 	$ docker login (add credentials)
-	$ # docker tag pingservices tetracon/pingservices:2.14
 	# push image to repository
 	$ docker push tetracon/pingservices:2.14
 	$ docker logoff
@@ -167,40 +160,6 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 
 	<!-- -->
 	
-	$ docker-compose -v
-	# docker-compose version 1.14.0, build c7bdf9e
-	$ docker-machine -v
-	# docker-machine version 0.12.0, build 45c69ad
-	$ docker -v
-	# Docker version 17.05.0-ce, build 89658be
-	#
-	$ docker-compose version
-	# docker-compose version 1.14.0, build c7bdf9e
-	# docker-py version: 2.4.0
-	# CPython version: 2.7.9
-	# OpenSSL version: OpenSSL 1.0.1t  3 May 2016
-	#
-	$ docker version
-	# Client:
-	# Version:      17.05.0-ce
- 	# API version:  1.29
- 	# Go version:   go1.7.5
- 	# Git commit:   89658be
- 	# Built:        Thu May  4 22:30:54 2017
- 	# OS/Arch:      linux/arm
-
-	# Server:
- 	# Version:      17.05.0-ce
- 	# API version:  1.29 (minimum version 1.12)
- 	# Go version:   go1.7.5
- 	# Git commit:   89658be
- 	# Built:        Thu May  4 22:30:54 2017
- 	# OS/Arch:      linux/arm
- 	# Experimental: false
- 	#
- 	# update docker hypriotOS
- 	$ # DONT WORK -- apt-get update apt-get install docker-hypriot docker-compose
-	$ apt-get update && apt-get install docker-compose
 	
 ##docker-compose.yaml
 
@@ -224,7 +183,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
    networks:
      webnet:
 
-	# for production we can use docker-compose file, then we use docker stack deploy....      
+	# for production we can use a docker-compose file, then we use docker stack deploy....      
 	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
 	$ docker service ps pingservices
 	$ docker service tasks pingservices
@@ -232,7 +191,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	
 	# with docker run instead to be able to shell into the container
 	$ docker run -it tetracon/pingservices:2.14 sh
-	# stop the container when you are finnsihed
+	# stop the container when you are finnished
 	$ docker stop <container-id>
 	$ docker rm <container-id>
 	$ sudo shutdown -h
@@ -242,7 +201,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 
 	$ docker ps # to find out container id
 	# shell into the container
-	$ docker exec -it <container_id> sh
+	$ docker exec -it <container_id> sh #remember to comment CMD["./PINGSERVICES"] in file Dockerfile.builder
 	
 ##docker service create error
 
@@ -251,12 +210,12 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	
 ==ERROR==
 
-**image tetracon/pingservices:1.7 could not be accessed on a registry to record its digest. Each node will access tetracon/pingservices:1.7 independently, possibly leading to different nodes running different
+**image tetracon/pingservices:2.14 could not be accessed on a registry to record its digest. Each node will access tetracon/pingservices:2.14 independently, possibly leading to different nodes running different
 versions of the image.**
 
 This is solved by using ==**--with-registry-auth**== as a argument to docker service create
 
-	$ docker service create --name=pingservices --publish=80:9000 --with-registry-auth tetracon/pingservices:1.9
+	$ docker service create --name=pingservices --publish=80:9000 --with-registry-auth tetracon/pingservices:2.14
 	
 **Explained by thaJeztah at github**
 
@@ -265,10 +224,8 @@ When updating services that need credentials to pull the image, you need to pass
 Even though the "node" in this case is your local node, swarm takes the same approach (otherwise it would only be able to pull the image on the local node, but not on any of the other nodes).
 
 Setting the --with-registry-auth option passes your locally stored credentials to the daemon, and stores them in the raft store. After that, the image digest is resolved (using those credentials), and the image is pulled on the node that the task is scheduled on (again, using the credentials that were stored in the service).
-
-Can you confirm if passing --with-registry-auth makes the problem go away?
 	
-#Mac OSX known_hosts
+#Mac OSX known_hosts problem
 
 	$ <user-id>/.ssh		#catalog on Mac
 
