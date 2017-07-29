@@ -2,32 +2,32 @@
 
 We need to update this documentation 2017-07-29 Kjell Almgren
 
-##docker run images
+## docker run images
 	$ # not nessecary if you use docker-compose.yml
 	$ docker run --publish 8443:8443 --name pingservices -t pingservices
 
-##stop container
+## stop container
 	$ docker stop <CONTAINER ID>
 	$ docker ps	# list running container with CONTAINER ID
 	$ docker ps -all # list all container (for rm)
 	$ docker stats <CONTAINER ID>
 	
-##remove container
+## Remove container
 	$ docker rm <CONTAINER ID>
 	
-##Images
+## Images
     #list all images
 	$ docker images
 	# remove images
 	$ docker rmi <IMAGE ID> 
 
-##remove all stopped containers
+## Remove all stopped containers
 	$ docker rm $(docker ps -q -f status=exited)
 
-##Entirely wipe out all containers
+## Entirely wipe out all containers
 	$ docker rm $(docker ps -a -q)
 	
-#Dockerfile.builder
+# Dockerfile.builder
 
     # start from hypriot/rpi-alpine-scratch (nginx:alpine)
     #
@@ -101,18 +101,18 @@ To build it manually run this command to build it.
 	$ docker build -f Dockerfile.production -t pingservices:2.14 .
 	
 	
-##Docker Comparing Containers and Virtual Machines
+## Docker Comparing Containers and Virtual Machines
 
 	http://www.docker.com/what-docker
 	
-##docker tutorial repro
+## Docker tutorial repro
 
 	1. https://docs.docker.com/get-started/#container-diagram
 	2. https://docs.docker.com/get-started/part2/#conclusion-of-part-one
 	3. https://docs.docker.com/get-started/part3/#understanding-services
 	4. 
 
-#Docker on Raspberry PI3
+# Docker on Raspberry PI3
 
 	# We need to compile for 64 bits armv8
 	$ GOOS=linux GOARCH=arm64 go build -v
@@ -129,7 +129,7 @@ To build it manually run this command to build it.
 	#if pulled from docker hub
 	$ docker pull tetracon/pingservices:2.14
 	
-##Docker swarm visualizer
+## Docker swarm visualizer
 	
 https://github.com/dockersamples/docker-swarm-visualizer
 
@@ -154,7 +154,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	
 	<!-- -->
 
-##Build docker image (pingservices)
+## Build docker image (pingservices)
 	
 	# build with tag pingservices (-t=tag)
 	$ docker build --file Dockerfile.builder -t tetracon/pingservices:2.14 .
@@ -164,7 +164,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	$ docker push tetracon/pingservices:2.14
 	$ docker logoff
 	
-##Docker pull images from repository
+## Docker pull images from repository
 	#
 	$ docker login
 	$ docker pull tetracon/pingservices:2.14
@@ -177,12 +177,12 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	$ docker service ps pingservices
 	
 		
-##docker versions on HypriotOS 1.5.0
+## Docker versions on HypriotOS 1.5.0
 
 	<!-- -->
 	
 	
-##docker-compose.yaml
+## Docker-compose.yaml
 
 	version: "3"
 
@@ -218,13 +218,13 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	$ sudo shutdown -h
 	
 
-##Docker exec
+## Docker exec
 
 	$ docker ps # to find out container id
 	# shell into the container
 	$ docker exec -it <container_id> sh #remember to comment CMD["./PINGSERVICES"] in file Dockerfile.builder
 	
-##docker service create error
+## Docker service create error
 
 	$ docker service create --name=pingservices --publish=80:9000 tetracon/pingservices:2.14
 	
@@ -246,7 +246,7 @@ Even though the "node" in this case is your local node, swarm takes the same app
 
 Setting the --with-registry-auth option passes your locally stored credentials to the daemon, and stores them in the raft store. After that, the image digest is resolved (using those credentials), and the image is pulled on the node that the task is scheduled on (again, using the credentials that were stored in the service).
 	
-#Mac OSX known_hosts problem
+# Mac OSX known_hosts problem
 
 	$ <user-id>/.ssh		#catalog on Mac
 
