@@ -177,11 +177,6 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	# find out wich node service is executing in
 	$ docker service ps pingservices
 	
-		
-## Docker versions on HypriotOS 1.5.0
-
-	<!-- -->
-	
 	
 ## Docker-compose.yaml
 
