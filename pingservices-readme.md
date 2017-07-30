@@ -1,6 +1,10 @@
 # Project Docker container on raspberry PI 3 cluster
 
-We need to update this documentation 2017-07-29 Kjell Almgren
+We should update this documentation 2017-07-29 Kjell Almgren to be more of a step guide...
+
+## Goal
+
+## Description
 
 ## docker run images
 	$ # not nessecary if you use docker-compose.yml
@@ -29,26 +33,23 @@ We need to update this documentation 2017-07-29 Kjell Almgren
 	
 # Dockerfile.builder
 
-    # start from hypriot/rpi-alpine-scratch (nginx:alpine)
     #
     # -------------------------------------------------
-    # FROM scratch
+    # FROM resin/rpi-raspbian
     # MAINTAINER kjell.almgren@tetracon.se
     # ADD pingservices /pingservices
     # ENTRYPOINT ["/pingservices"] 
-    #
     # -------------------------------------------------
     FROM resin/rpi-raspbian
 
     MAINTAINER kjell.almgren@tetracon.se
 
-    # make some update to the OS in the container
+    # make some update to the OS in the container, comment out at this point
     #RUN apk update && \
     #apk upgrade && \
     #apk add bash && \
     #rm -rf /var/cache/apk/*
 
-    #make some changes to the container images (docker dns-bugs)
     #COPY docker-compose.yml docker-compose.yaml
     #switch to our app directory (/pingservices)
     RUN mkdir -p /pingservices
@@ -67,7 +68,7 @@ We need to update this documentation 2017-07-29 Kjell Almgren
     COPY dist/fonts dist/fonts
     COPY dist/js dist/js
 
-    #COPY images files
+    #COPY images directory
     COPY images images
 
     #vendor files
@@ -85,33 +86,21 @@ We need to update this documentation 2017-07-29 Kjell Almgren
     # COPY pingservices pingservices
     ADD pingservices /pingservices
 
-    # copy our self-signed certificate for now
-    ##COPY tetracon-server.crt /go/src/server
-    ##COPY tetracon-server.key /go/src/server
+    # copy our self-signed certificate for now, left out at this point
+    #COPY tetracon-server.crt /go/src/server
+    #COPY tetracon-server.key /go/src/server
 
     # tell we are exposing our service on port 9000
     EXPOSE 9000
 
     # run it!
     CMD ["./pingservices"]
-    #ENTRYPOINT ["/pingservices"]
 
-To build it manually run this command to build it. 
+To build it manually run this command. 
 
-	$ docker build -f Dockerfile.production -t pingservices:2.14 .
+	$ docker build -f Dockerfile.builder -t pingservices:2.14 .
 	
 	
-## Docker Comparing Containers and Virtual Machines
-
-	http://www.docker.com/what-docker
-	
-## Docker tutorial repro
-
-	1. https://docs.docker.com/get-started/#container-diagram
-	2. https://docs.docker.com/get-started/part2/#conclusion-of-part-one
-	3. https://docs.docker.com/get-started/part3/#understanding-services
-	4. 
-
 # Docker on Raspberry PI3
 
 	# We need to compile for 64 bits armv8
@@ -122,12 +111,6 @@ To build it manually run this command to build it.
 	
 	$ docker build --file Dockerfile.production -t pingservices .
 	
-	
-	#
-	$ docker tag server tetracon/pingservices:2.14
-	$ docker push tetracon/pingservices:2.14
-	#if pulled from docker hub
-	$ docker pull tetracon/pingservices:2.14
 	
 ## Docker swarm visualizer
 	
@@ -169,7 +152,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	$ docker login
 	$ docker pull tetracon/pingservices:2.14
 	$ docker images
-	# docker service create or user docker-compose.yaml (see below)
+	# docker service create or use docker-compose.yaml (see below)
 	$ docker service create --name=pingservices --publish=80:9000 --with-registry-auth tetracon/pingservices:2.14
 	# remove service
 	$ docker service rm pingservices
@@ -204,13 +187,15 @@ Should be run in the swarm manager, remember to login to hub.docker.com
    networks:
      webnet:
 
-	# for production we can use a docker-compose file, then we use docker stack deploy....      
+	# for production we can use a docker-compose file, and then use docker stack deploy....      
 	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
 	$ docker service ps pingservices
 	$ docker service tasks pingservices
 	$ docker stack ls
-	
-	# with docker run instead to be able to shell into the container
+
+##Docker debugging
+
+	# docker run instead to be able to shell into the container
 	$ docker run -it tetracon/pingservices:2.14 sh
 	# stop the container when you are finnished
 	$ docker stop <container-id>
@@ -222,12 +207,12 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 
 	$ docker ps # to find out container id
 	# shell into the container
-	$ docker exec -it <container_id> sh #remember to comment CMD["./PINGSERVICES"] in file Dockerfile.builder
+	#remember to comment CMD["./PINGSERVICES"] in file Dockerfile.builder and build a new container
+	$ docker exec -it <container_id> sh 
 	
 ## Docker service create error
 
 	$ docker service create --name=pingservices --publish=80:9000 tetracon/pingservices:2.14
-	
 	
 ==ERROR==
 
