@@ -2,9 +2,27 @@
 
 We should update this documentation 2017-07-29 Kjell Almgren to be more of a step guide...
 
-## Goal
+## HypriotOS 64bit armv8
 
-## Description
+We will use hypriotOS on all four raspberry PI 3 since after all it is 64 bit. This distribution is prepared with docker 1.13.1 by Dieter Reuter excellent work. You find the image here on github. Follow the instructions by Dieter. I flash this to a SD card using etcher, that the only difference.
+
+	image: https://github.com/DieterReuter/image-builder-rpi64/releases/tag/v20170303-185520
+	repo: https://github.com/DieterReuter/image-builder-rpi64
+
+## device-init
+When you boot up the server on raspberry pi 3 it's going to have a hostname of black-pearl, the user is pirate with password hypriot. To be able to build a cluster you need to set different hostname for each node. In the /boot/ directory there is a utility for this. /boot/device-init. You can set the hostname and even wifi settings thru this utility.
+
+	$ device-init set hostname <hostname>
+
+For our project we will set the following name for each Raspberry PI 3.
+
+Master: black-pearl64
+Worker1: black-pearl64-w1
+Worker2: black-pearl64-w2
+Worker3: black-pearl64-w3
+
+<TBD> picture here
+
 
 ## docker run images
 	$ # not nessecary if you use docker-compose.yml
