@@ -10,20 +10,20 @@ We will use hypriotOS on all four raspberry PI 3 since after all it is 64 bits. 
 	repo: https://github.com/DieterReuter/image-builder-rpi64
 
 ## device-init
-When you boot up the server on raspberry pi 3 it's going to have a hostname of black-pearl, the user is pirate with password hypriot. To be able to build a cluster you need to set different hostname for each node. In the /boot/ directory there is a utility for this. /boot/device-init. You can set the hostname and even wifi settings thru this utility.
+When you boot up the server on raspberry pi 3 it's going to have a hostname of **black-pearl**, the user is **pirate** with password hypriot. To be able to build a cluster you need to set different hostname for each node. In the /boot/ directory there is a utility for this. /boot/device-init. You can set the hostname and even wifi settings thru this utility.
 
-	#To show hostname
+	# To show hostname
 	$ device-init hostname show
-	#To set hostname
+	# To set hostname
 	$ device-init hostname set <hostname>
-	#If you just use "device-init -c" it will use "/boot/device-init.yml"
+	# If you just use "device-init -c" it will use yaml file @ "/boot/device-init.yml"
 
-For our project we will set the following name for each Raspberry PI 3.
+For our project we will set the following names for each Raspberry PI 3.
 
-Master: black-pearl64
-Worker1: black-pearl64-w1
-Worker2: black-pearl64-w2
-Worker3: black-pearl64-w3
+* Master: black-pearl64
+* Worker1: black-pearl64-w1
+* Worker2: black-pearl64-w2
+* Worker3: black-pearl64-w3
 
 ![Rpi-3 Cluster](/images/cluster-cli-01.png)
 
