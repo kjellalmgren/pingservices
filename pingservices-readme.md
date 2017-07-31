@@ -22,7 +22,7 @@ Worker2: black-pearl64-w2
 Worker3: black-pearl64-w3
 
 	![Rpi-3 Cluster] (https://github.com/kjellalmgren/pingservices/tree/master/images/cluster-cli-01.png)
-![] (/images/cluster-cli-01.png)
+	![](/images/cluster-cli-01.png)
 
 ## docker run images
 	$ # not nessecary if you use docker-compose.yml
