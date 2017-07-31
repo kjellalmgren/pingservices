@@ -12,7 +12,11 @@ We will use hypriotOS on all four raspberry PI 3 since after all it is 64 bits. 
 ## device-init
 When you boot up the server on raspberry pi 3 it's going to have a hostname of black-pearl, the user is pirate with password hypriot. To be able to build a cluster you need to set different hostname for each node. In the /boot/ directory there is a utility for this. /boot/device-init. You can set the hostname and even wifi settings thru this utility.
 
-	$ device-init set hostname <hostname>
+	#To show hostname
+	$ **device-init hostname show**
+	#To set hostname
+	$ ==device-init hostname set <hostname>==
+	#If you just use "device-init -c" it will use "/boot/device-init.yml"
 
 For our project we will set the following name for each Raspberry PI 3.
 
