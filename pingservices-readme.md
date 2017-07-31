@@ -239,7 +239,7 @@ This is solved by using ==**--with-registry-auth**== as a argument to docker ser
 
 	$ docker service create --name=pingservices --publish=80:9000 --with-registry-auth tetracon/pingservices:2.14
 	
-**Explained by thaJeztah at github**
+**Explained by @thaJeztah at github**
 
 When updating services that need credentials to pull the image, you need to pass --with-registry-auth. Images pulled for a service take a different path than a regular docker pull, because the actual pull is performed on each node in the swarm where an instance is deployed. To pull an image, the swarm cluster needs to have the credentials stored (so that the credentials can be passed on to the node it performs the pull on).
 
