@@ -175,7 +175,6 @@ The response from docker is that the swarm has been initilized and is now a mana
 
 	This node joined a swarm as a worker.
 
-
 ## Docker swarm visualizer
 
 Alex Ellis has done a create job to helped build a visualizer for docker swarms. Get the image from docker hub by executing the following command att the manager machine (master). Alex has a lot of information at github, worth reading.
@@ -207,7 +206,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	whpy9vnpgseg  viz.1  alexellis2/visualizer-arm:latest  black-pearl64  Running        Running 9 seconds ago
   	<!-- -->
 
-To show the visualizer in your web-browser you can point the browser to http://ip-adr-to-master:4000. To find out ip-adr for your manager use:
+To show the visualizer in your web-browser you can point the browser to *"http://ip-adr-to-master:4000"*. To find out ip-adr for your manager use:
 
 	$ ifconfig eth0 (in my case)
 	eth0      Link encap:Ethernet  HWaddr b8:27:eb:6a:ae:d9
@@ -219,7 +218,7 @@ To show the visualizer in your web-browser you can point the browser to http://i
           collisions:0 txqueuelen:1000
           RX bytes:1003540 (980.0 KiB)  TX bytes:892215 (871.3 KiB)
     
-So in my case I will enter http://192.168.1.246:4000. If you are in the same subnet you can probably use hostname black-pearl64:4000.
+So in my case I will enter http://192.168.1.246:4000. If you are in the same subnet you can probably use *hostname black-pearl64:4000*.
 
 ![Visualizer](/images/cluster-cli-viz.png)
 
@@ -236,24 +235,24 @@ Now when the cluster is up and running we can start our image pingservices as a 
 	tetracon/pingservices       2.14                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	
-To be able to start tetracon/pingservices:2.14 we have to make sure that we have a Docker-compose.yaml file at our cluster manager.
+To be able to start *tetracon/pingservices:2.14* we have to make sure that we have a *Docker-compose.yaml* file at our cluster manager.
 
 	HypriotOS/arm64: pirate@black-pearl64 in ~
 	$ ls
 	docker-compose.yaml  pingservices
 
-See the Docker-compose.yaml file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and restart-policies.
+See the *Docker-compose.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and restart-policies.
 
 
 	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
 	# Creating network pingservices_webnet
 	# Creating service pingservices_web
 
-The --with-registry-auth argument to docker is nescessary for docker to be able to instanciate each container somewhere in the cluster. See error section for more description from @thaJeztah.
+The **--with-registry-auth** argument to docker is nescessary for docker to be able to instantiate each container somewhere in the cluster. See error section for more description from @thaJeztah.
 
 ![RPi-Cluster](images/cluster-cli-ping.png)
 
-If everything working as expcected we should see that pingservices_web is running as 4 services in our cluster. Feel free to elaborate with the .yaml file to scale up and down the service. One thing to consider is that it´s not much of a deal to start more containers per machine that you have cores. Of course there will be circumstances, but in general.
+If everything working as expcected we should see that **pingservices_web** is running as 4 services in our cluster. Feel free to elaborate with the .yaml file to scale up and down the service. One thing to consider is that it´s not much of a deal to start more containers per machine that you have cores. Of course there will be circumstances, but in general.
 
 	$ docker service ps pingservices_web
 	ID            NAME                IMAGE                       NODE              DESIRED STATE  CURRENT STATE           ERROR  PORTS
