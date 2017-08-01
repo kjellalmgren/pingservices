@@ -118,7 +118,7 @@ Now we will start to build up our image layer by layer, we start with **resin/rp
 	# If build succeded you will se the image in the repository. In this case a compiled it under Mac OSX so the image will be at the host environment.
 
 	$ docker images
-	#**REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE**
+	#REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
 	#tetracon/pingservices        2.14                d9a1ae8eea6a        3 days ago          134MB
 
 **At this point you can upload the image to the repository at hub.docker.com.**
@@ -147,7 +147,7 @@ By starting all RPi-3 (se picture above). The master and each workers. SSH into 
 **To se all machine in the swarm:**
 
 	$ docker node ls
-	**ID                           HOSTNAME          STATUS  AVAILABILITY  MANAGER STATUS**
+	ID                           HOSTNAME          STATUS  AVAILABILITY  MANAGER STATUS
 	gvpwrxkapbyaq9rvzykw9zhzq    black-pearl64-w2  Ready   Active
 	h81sdg34knb6topptf18afr6c    black-pearl64-w1  Ready   Active
 	rowis32mdry238tejj62e8a8s *  black-pearl64     Ready   Active        Leader
@@ -203,7 +203,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
   	alexellis2/visualizer-arm:latest
   	
 	$ docker service ps viz
-	**#ID            NAME   IMAGE                            NODE           DESIRED STATE  CURRENT STATE          ERROR  PORTS**
+	#ID            NAME   IMAGE                            NODE           DESIRED STATE  CURRENT STATE          ERROR  PORTS
 	whpy9vnpgseg  viz.1  alexellis2/visualizer-arm:latest  black-pearl64  Running        Running 9 seconds ago
   	<!-- -->
 
