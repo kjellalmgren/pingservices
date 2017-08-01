@@ -10,7 +10,7 @@ We will use hypriotOS on all four raspberry PI 3 since after all it is 64 bits. 
 	repo: https://github.com/DieterReuter/image-builder-rpi64
 
 ## device-init
-When you boot up the server on raspberry pi 3 it's going to have a hostname of **black-pearl**, the user is **pirate** with password **hypriot**. To be able to build a cluster you need to set different hostname for each node. In the /boot/ directory there is a utility for this by the team of hypriot. /boot/device-init. You can set the hostname and even wifi settings thru this utility.
+When you boot up the server on raspberry pi 3 it's going to have a hostname of **black-pearl**, the user is **pirate** with password **hypriot**. To be able to build a cluster you need to set different hostname for each node. In the **/boot/** directory there is a utility for this by the team of hypriot. **/boot/device-init**. You can set the hostname and even wifi settings thru this utility.
 
 	# To show hostname
 	$ device-init hostname show
@@ -20,7 +20,7 @@ When you boot up the server on raspberry pi 3 it's going to have a hostname of *
 
 Repeat the above steps for each RPi-3.
 
-For our project we will set the following names for each Raspberry PI 3.
+For our project we will set the following names for each Raspberry Pi-3.
 
 * Master: black-pearl64
 * Worker1: black-pearl64-w1
@@ -36,7 +36,7 @@ As you can se in the picture above, hypriotOS 64bit comes with docker 1.13.1 pre
 
 To be able to execute our go program in the container based on resin/rpi-raspbian we have to compile for the right target environment. In this case we will set GOOS=linux and GOARCH=arm64.
 
-	# We need to compile for 64 bits armv8
+	# We need to compile for 64-bits armv8
 	$ GOOS=linux GOARCH=arm64 go build -v
 
 	$ file pingservices
@@ -49,7 +49,7 @@ To be able to execute our go program in the container based on resin/rpi-raspbia
 
 **Dockerfile.builder**
 
-Now we will start to build up our image layer by layer, we start with resin/rpi-raspbian as our base layer. You find this on hub.docker.com. After this you will start adding our go programs all prerequisite, directories and files.
+Now we will start to build up our image layer by layer, we start with **resin/rpi-raspbian** as our base layer. You find this on http://hub.docker.com. After this you will start adding our go programs all prerequisite, directories and files.
 
     # -------------------------------------------------
     # FROM resin/rpi-raspbian
@@ -112,12 +112,13 @@ Now we will start to build up our image layer by layer, we start with resin/rpi-
     # run it!
     CMD ["./pingservices"]
 
-**To build it manually run this command.**
+**To build it manually run docker build command**
 
 	$ docker build -f Dockerfile.builder -t pingservices:2.14 .
-	# show the local image
+	# If build succeded you will se the image in the repository. In this case a compiled it under Mac OSX so the image will be at the host environment.
+
 	$ docker images
-	#REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
+	#**REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE**
 	#tetracon/pingservices        2.14                d9a1ae8eea6a        3 days ago          134MB
 
 **At this point you can upload the image to the repository at hub.docker.com.**
@@ -146,7 +147,7 @@ By starting all RPi-3 (se picture above). The master and each workers. SSH into 
 **To se all machine in the swarm:**
 
 	$ docker node ls
-	ID                           HOSTNAME          STATUS  AVAILABILITY  MANAGER STATUS
+	**ID                           HOSTNAME          STATUS  AVAILABILITY  MANAGER STATUS**
 	gvpwrxkapbyaq9rvzykw9zhzq    black-pearl64-w2  Ready   Active
 	h81sdg34knb6topptf18afr6c    black-pearl64-w1  Ready   Active
 	rowis32mdry238tejj62e8a8s *  black-pearl64     Ready   Active        Leader
@@ -183,7 +184,7 @@ Alex Ellis has done a create job to helped build a visualizer for docker swarms.
 	$ docker docker pull alexellis2/visualizer-arm:latest
 	# you can show all images by
 	$ docker images
-	REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
+	**REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE**
 	tetracon/pingservices       2.14                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	$
@@ -202,7 +203,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
   	alexellis2/visualizer-arm:latest
   	
 	$ docker service ps viz
-	#ID            NAME   IMAGE                            NODE           DESIRED STATE  CURRENT STATE          ERROR  PORTS
+	**#ID            NAME   IMAGE                            NODE           DESIRED STATE  CURRENT STATE          ERROR  PORTS**
 	whpy9vnpgseg  viz.1  alexellis2/visualizer-arm:latest  black-pearl64  Running        Running 9 seconds ago
   	<!-- -->
 
@@ -210,7 +211,7 @@ To show the visualizer in your web-browser you can point the browser to *"http:/
 
 	$ ifconfig eth0 (in my case)
 	eth0      Link encap:Ethernet  HWaddr b8:27:eb:6a:ae:d9
-          inet addr:*192.168.1.246*  Bcast:192.168.1.255  Mask:255.255.255.0
+          inet addr:**192.168.1.246**  Bcast:192.168.1.255  Mask:255.255.255.0
           inet6 addr: fe80::ba27:ebff:fe6a:aed9/64 Scope:Link
           UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
           RX packets:8221 errors:0 dropped:0 overruns:0 frame:0
@@ -269,7 +270,7 @@ If everything working as expcected we should see that **pingservices_web** is ru
 	# remove service
 	$ docker service rm pingservices_web
 	
-So our goal is meet, we have a docker swarm cluster up and running on 4 node of RPi-3. If you still has RPi-2 machines Hypriot has a 32-bit arm7 OS with docker 17.05 ce.
+So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of RPi-3. If you still has RPi-2 machines Hypriot has a 32-bit arm7 OS with docker 17.05 ce.
 	
 ## Docker-compose.yaml
 
