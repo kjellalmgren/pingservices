@@ -3,10 +3,8 @@
 # -------------------------------------------------
 # FROM scratch
 # MAINTAINER kjell.almgren@tetracon.se
-# ADD pingservices /pingservices
-# ENTRYPOINT ["/pingservices"] 
-#
 # -------------------------------------------------
+#
 FROM resin/rpi-raspbian
 
 MAINTAINER kjell.almgren@tetracon.se
@@ -51,12 +49,12 @@ COPY templates templates
 COPY main.css main.css
 COPY services-prod.json services-prod.json
 COPY services-qa.json services-qa.json
-# COPY pingservices pingservices
-ADD pingservices /pingservices
+# COPY executable pingservices /pingservices
+COPY pingservices /pingservices
 
 # copy our self-signed certificate
-##COPY tetracon-server.crt /go/src/server
-##COPY tetracon-server.key /go/src/server
+##COPY tetracon-server.crt /go/src/pingservices
+##COPY tetracon-server.key /go/src/pingservices
 
 # tell we are exposing our service on port 9000
 EXPOSE 9000

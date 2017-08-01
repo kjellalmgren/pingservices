@@ -4,19 +4,21 @@ We should update this documentation 2017-07-29 Kjell Almgren to be more of a ste
 
 ## HypriotOS 64bit armv8
 
-We will use hypriotOS on all four raspberry PI 3 since after all it is 64 bits. This distribution is prepared with docker 1.13.1 by Dieter Reuter excellent work. You find the image here on github. Follow the instructions by Dieter. I flash this to a SD card using etcher, that the only difference.
+We will use hypriotOS on all four raspberry PI 3 since after all it is 64 bits. This distribution is prepared with docker 1.13.1 by Dieter Reuter excellent work. You find the image here on github. Follow the instructions by Dieter. I flash this to a SD card using etcher on OSX, that the only differences.
 
 	image: https://github.com/DieterReuter/image-builder-rpi64/releases/tag/v20170303-185520
 	repo: https://github.com/DieterReuter/image-builder-rpi64
 
 ## device-init
-When you boot up the server on raspberry pi 3 it's going to have a hostname of **black-pearl**, the user is **pirate** with password hypriot. To be able to build a cluster you need to set different hostname for each node. In the /boot/ directory there is a utility for this. /boot/device-init. You can set the hostname and even wifi settings thru this utility.
+When you boot up the server on raspberry pi 3 it's going to have a hostname of **black-pearl**, the user is **pirate** with password **hypriot**. To be able to build a cluster you need to set different hostname for each node. In the /boot/ directory there is a utility for this by the team of hypriot. /boot/device-init. You can set the hostname and even wifi settings thru this utility.
 
 	# To show hostname
 	$ device-init hostname show
 	# To set hostname
 	$ device-init hostname set <hostname>
 	# If you just use "device-init -c" it will use yaml file @ "/boot/device-init.yml"
+
+Repeat the above steps for each RPi-3.
 
 For our project we will set the following names for each Raspberry PI 3.
 
@@ -27,40 +29,34 @@ For our project we will set the following names for each Raspberry PI 3.
 
 ![Rpi-3 Cluster](/images/cluster-cli-01.png)
 
-## docker run images
-	$ # not nessecary if you use docker-compose.yml
-	$ docker run --publish 8443:8443 --name pingservices -t pingservices
+As you can se in the picture above, hypriotOS 64bit comes with docker 1.13.1 preinstalled.
 
-## stop container
-	$ docker stop <CONTAINER ID>
-	$ docker ps	# list running container with CONTAINER ID
-	$ docker ps -all # list all container (for rm)
-	$ docker stats <CONTAINER ID>
-	
-## Remove container
-	$ docker rm <CONTAINER ID>
-	
-## Images
-    #list all images
-	$ docker images
-	# remove images
-	$ docker rmi <IMAGE ID> 
 
-## Remove all stopped containers
-	$ docker rm $(docker ps -q -f status=exited)
+# Build our go program for the right OS and architecture
 
-## Entirely wipe out all containers
-	$ docker rm $(docker ps -a -q)
-	
-# Dockerfile.builder
+To be able to execute our go program in the container based on resin/rpi-raspbian we have to compile for the right target environment. In this case we will set GOOS=linux and GOARCH=arm64.
 
-    #
+	# We need to compile for 64 bits armv8
+	$ GOOS=linux GOARCH=arm64 go build -v
+
+	$ file pingservices
+
+	If you execute "file pingservices" (OSX) you will se that it's compile for the right target environment.
+
+	# pingservices: ELF 64-bit LSB executable, ARM aarch64, version 1 (SYSV), statically linked, stripped
+
+
+# Build our image 
+
+==**Dockerfile.builder**==
+
+Now we will start to build up our image layer for layer, we start with resin/rpi-raspbian as a base layer. You find this on hub.docker.com. After this you will start adding our go programs all prerequisite, directories and files.
+
     # -------------------------------------------------
     # FROM resin/rpi-raspbian
     # MAINTAINER kjell.almgren@tetracon.se
-    # ADD pingservices /pingservices
-    # ENTRYPOINT ["/pingservices"] 
     # -------------------------------------------------
+	#
     FROM resin/rpi-raspbian
 
     MAINTAINER kjell.almgren@tetracon.se
@@ -104,12 +100,12 @@ For our project we will set the following names for each Raspberry PI 3.
     COPY main.css main.css
     COPY services-prod.json services-prod.json
     COPY services-qa.json services-qa.json
-    # COPY pingservices pingservices
-    ADD pingservices /pingservices
+    # COPY executables pingservices /pingservices
+    COPY pingservices /pingservices
 
-    # copy our self-signed certificate for now, left out at this point
-    #COPY tetracon-server.crt /go/src/server
-    #COPY tetracon-server.key /go/src/server
+    # copy our self-signed certificate for now, left out at this point, have'nt done enough testing.
+    #COPY tetracon-server.crt /go/src/pingservices
+    #COPY tetracon-server.key /go/src/pingservices
 
     # tell we are exposing our service on port 9000
     EXPOSE 9000
@@ -120,43 +116,115 @@ For our project we will set the following names for each Raspberry PI 3.
 To build it manually run this command. 
 
 	$ docker build -f Dockerfile.builder -t pingservices:2.14 .
-	
-	
-# Docker on Raspberry PI3
+	# show the local image
+	$ docker images
+	#REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
+	#tetracon/pingservices        2.14                d9a1ae8eea6a        3 days ago          134MB
 
-	# We need to compile for 64 bits armv8
-	$ GOOS=linux GOARCH=arm64 go build -v
-	$ file pingservices
-	
-	# pingservices: ELF 64-bit LSB executable, ARM aarch64, version 1 (SYSV), statically linked, stripped
-	
-	$ docker build --file Dockerfile.production -t pingservices .
-	
-	
+At this point you can upload the image to the repository at hub.docker.com.
+
+	$ docker login
+	# ...
+	# push the image to "your" repository. push repository/name:tag
+	$ push tetracon/pingservices:2.14
+	$ docker logout
+
+Tag :2.14 in this case it's just my version number, you can set whatever you want. This is just to tag each image in the your repository.
+
+## Start the cluster
+By starting all RPi-3 (se picture above). The master and each workers. SSH into each machine.
+
+## SSH into each Machine
+
+	$ ssh pirate@black-pearl64.local # enter password: hypriot
+	# do the same for each machine.
+	$ ssh pirate@black-pearl64-w1.local
+	$ ssh pirate@black-pearl64-w2.local
+	$ ssh pirate@black-pearl64-w3.local
+
+	#black-pearl64 is the master, to let it be the master i our cluster we initialize it.
+
+To se all machine in the swarm:
+
+	$ docker node ls
+	ID                           HOSTNAME          STATUS  AVAILABILITY  MANAGER STATUS
+	gvpwrxkapbyaq9rvzykw9zhzq    black-pearl64-w2  Ready   Active
+	h81sdg34knb6topptf18afr6c    black-pearl64-w1  Ready   Active
+	rowis32mdry238tejj62e8a8s *  black-pearl64     Ready   Active        Leader
+	w1ljt999az5kb4ffhqjzwt9aw    black-pearl64-w3  Ready   Active
+
+We can se that node black-peasrl64 is the manager. It is possibly to have more manager, not just one. But we are perfectly happy with just one leader.
+
+	$ docker swarm init
+
+	Swarm initialized: current node (rowis32mdry238tejj62e8a8s) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join \
+    --token SWMTKN-1-2w2uu2rmwhi9eqbqrfn51ak70atlvlaz5fihi8hos3q5hk8o2t-a9rfmy05ak92a3ji6zkzc3v73 \
+    192.168.1.246:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+HypriotOS/arm64: pirate@black-pearl64 in ~
+
+The response from docker is that the swarm has been initilized and is now a manager. It also stated that we should exec docker swarm join in each worker machine. Copy the text and execute this command in worker machine.
+
+	$ docker swarm join \
+	>     --token SWMTKN-1-2w2uu2rmwhi9eqbqrfn51ak70atlvlaz5fihi8hos3q5hk8o2t-a9rfmy05ak92a3ji6zkzc3v73 \
+	>     192.168.1.246:2377
+
+This node joined a swarm as a worker.
+
+
 ## Docker swarm visualizer
-	
-https://github.com/dockersamples/docker-swarm-visualizer
+
+Alex Ellis has done a create job to helped build a visualizer for ther docker swarm. Get the image from docker hub by executing the following command att the manager machine (master).
+
+	$ docker login #obviously...
+	$ docker docker pull alexellis2/visualizer-arm
+	# you can show all images by
+	$ docker images
+	REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
+	tetracon/pingservices       2.14                d9a1ae8eea6a        3 days ago          134 MB
+	tetracon/pingservices       2.12                21f71e6febb7        3 days ago          137 MB
+	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
+	$
+
+You find more information at https://github.com/dockersamples/docker-swarm-visualizer
 
 Should be run in the swarm manager, remember to login to hub.docker.com	
 
 	<!-- -->
 	
-	docker service create \
+	$ docker service create \
 	  --name=viz \
  	 --publish=4000:8080/tcp \
   	--constraint=node.role==manager \
   		--mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
   	alexellis2/visualizer-arm:latest
   	
+	$ docker service ps viz
+	#ID            NAME   IMAGE                            NODE           DESIRED STATE  CURRENT STATE          ERROR  PORTS
+	whpy9vnpgseg  viz.1  alexellis2/visualizer-arm:latest  black-pearl64  Running        Running 9 seconds ago
   	<!-- -->
 
-    #command to be used for viz
-	$ docker ps viz
-	$ docker service ls
-	$ docker node inspect self #find out ip-adress for manager
-	$ docker service rm viz #remove current viz service
-	
-	<!-- -->
+To show the visualizer in your web-browser you can point the browser to http://ip-adr-to-master:4000. To find out ip-adr for your manager use:
+
+	$ ifconfig eth0
+	eth0      Link encap:Ethernet  HWaddr b8:27:eb:6a:ae:d9
+          inet addr:*192.168.1.246*  Bcast:192.168.1.255  Mask:255.255.255.0
+          inet6 addr: fe80::ba27:ebff:fe6a:aed9/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:8221 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:6026 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1003540 (980.0 KiB)  TX bytes:892215 (871.3 KiB)
+    
+So in my case I will enter http://192.168.1.246:4000. If you are in the same subnet you can probably use hostname black-pearl64:4000.
+
+![Visualizer](/images/cluster-cli-viz.png)
 
 ## Build docker image (pingservices)
 	
@@ -225,7 +293,36 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	# shell into the container
 	#remember to comment CMD["./PINGSERVICES"] in file Dockerfile.builder and build a new container
 	$ docker exec -it <container_id> sh 
+
+# Handy set of docker commands
+
+## docker run images
+	$ # not nessecary if you use docker-compose.yml
+	$ docker run --publish 8443:8443 --name pingservices -t pingservices
+
+## stop container
+	$ docker stop <CONTAINER ID>
+	$ docker ps	# list running container with CONTAINER ID
+	$ docker ps -all # list all container (for rm)
+	$ docker stats <CONTAINER ID>
 	
+## Remove container
+	$ docker rm <CONTAINER ID>
+	
+## Images
+    #list all images
+	$ docker images
+	# remove images
+	$ docker rmi <IMAGE ID> 
+
+## Remove all stopped containers
+	$ docker rm $(docker ps -q -f status=exited)
+
+## Entirely wipe out all containers
+	$ docker rm $(docker ps -a -q)
+
+
+# Docker Errors	
 ## Docker service create error
 
 	$ docker service create --name=pingservices --publish=80:9000 tetracon/pingservices:2.14
