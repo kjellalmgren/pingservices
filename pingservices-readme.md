@@ -292,7 +292,7 @@ If everything working as expcected we should see that pingservices_web is runnin
       - "80:9000"
     networks:
      - webnet:
-   networks:
+   	networks:
      webnet:
 
 
@@ -349,7 +349,7 @@ versions of the image.**
 
 This is solved by using ==**--with-registry-auth**== as a argument to docker service create
 
-	$ docker service create --name=pingservices --publish=80:9000 --with-registry-auth tetracon/pingservices:2.14
+	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
 	
 **Explained by @thaJeztah at github**
 
