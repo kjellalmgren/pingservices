@@ -188,7 +188,6 @@ Alex Ellis has done a create job to helped build a visualizer for ther docker sw
 	$ docker images
 	REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
 	tetracon/pingservices       2.14                d9a1ae8eea6a        3 days ago          134 MB
-	tetracon/pingservices       2.12                21f71e6febb7        3 days ago          137 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	$
 
@@ -212,7 +211,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 
 To show the visualizer in your web-browser you can point the browser to http://ip-adr-to-master:4000. To find out ip-adr for your manager use:
 
-	$ ifconfig eth0
+	$ ifconfig eth0 (in my case)
 	eth0      Link encap:Ethernet  HWaddr b8:27:eb:6a:ae:d9
           inet addr:*192.168.1.246*  Bcast:192.168.1.255  Mask:255.255.255.0
           inet6 addr: fe80::ba27:ebff:fe6a:aed9/64 Scope:Link
@@ -226,27 +225,52 @@ So in my case I will enter http://192.168.1.246:4000. If you are in the same sub
 
 ![Visualizer](/images/cluster-cli-viz.png)
 
-## Build docker image (pingservices)
-	
-	# build with tag pingservices (-t=tag)
-	$ docker build --file Dockerfile.builder -t tetracon/pingservices:2.14 .
-	# new from here
-	$ docker login (add credentials)
-	# push image to repository
-	$ docker push tetracon/pingservices:2.14
-	$ docker logoff
-	
+# Start our newly build image as a service in the cluster
+
+Now when the cluster is up and running we can start our image pingservices as a service at the manager. Start download the image from hub.docker.com. Remember to ssh into the manager when doing this.
+
 ## Docker pull images from repository
 	#
 	$ docker login
 	$ docker pull tetracon/pingservices:2.14
 	$ docker images
-	# docker service create or use docker-compose.yaml (see below)
-	$ docker service create --name=pingservices --publish=80:9000 --with-registry-auth tetracon/pingservices:2.14
+	REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
+	tetracon/pingservices       2.14                d9a1ae8eea6a        3 days ago          134 MB
+	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
+	
+To be able to start tetracon/pingservices:2.14 we have to make source that we have a Docker-compose.yaml file at cluster manager.
+
+	HypriotOS/arm64: pirate@black-pearl64 in ~
+	$ ls
+	docker-compose.yaml  pingservices
+
+See the Docker-compose.yaml file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and restart-policies.
+
+
+	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
+	# Creating network pingservices_webnet
+	# Creating service pingservices_web
+
+The --with-registry-auth argument to docker is nescessary for docker to be able to instanciate each container somewhere in the cluster. See error section for more description from @thaJeztah.
+
+![RPi-Cluster](images/cluster-cli-ping.png)
+
+If everything working as expcected we should see that pingservices_web is running as 4 services in our cluster. Feel free to elaborate with the .yaml file to scale up and down the service. One thing to consider is that it´s not much of a deal to start more containers per machine that you have cores. Of course there will be circumstances, but in general.
+
+	$ docker service ps pingservices_web
+	ID            NAME                IMAGE                       NODE              DESIRED STATE  CURRENT STATE           ERROR  PORTS
+	syvggmd4k4yk  pingservices_web.1  tetracon/pingservices:2.14  black-pearl64-w1  Running        Running 10 minutes ago
+	uhu2uhx4qu39  pingservices_web.2  tetracon/pingservices:2.14  black-pearl64-w2  Running        Running 10 minutes ago
+	ihdf9pdkxoox  pingservices_web.3  tetracon/pingservices:2.14  black-pearl64     Running        Running 8 minutes ago
+	sl59vluarf1s  pingservices_web.4  tetracon/pingservices:2.14  black-pearl64-w3  Running        Running 8 minutes ago
+
+	$ docker service ls
+	ID            NAME              MODE        REPLICAS  IMAGE
+	dgnn2ntd3ozo  viz               replicated  1/1       alexellis2/visualizer-arm:latest
+	oahpsvaugvl9  pingservices_web  replicated  4/4       tetracon/pingservices:2.14
+	
 	# remove service
-	$ docker service rm pingservices
-	# find out wich node service is executing in
-	$ docker service ps pingservices
+	$ docker service rm pingservices_web
 	
 	
 ## Docker-compose.yaml
@@ -257,7 +281,7 @@ So in my case I will enter http://192.168.1.246:4000. If you are in the same sub
   	web:
     image: tetracon/pingservices:2.14
     deploy:
-      replicas: 2
+      replicas: 4
       resources:
         limits:
           cpus: "0.1"
@@ -271,21 +295,11 @@ So in my case I will enter http://192.168.1.246:4000. If you are in the same sub
    networks:
      webnet:
 
-	# for production we can use a docker-compose file, and then use docker stack deploy....      
-	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
-	$ docker service ps pingservices
-	$ docker service tasks pingservices
-	$ docker stack ls
 
-##Docker debugging
 
-	# docker run instead to be able to shell into the container
-	$ docker run -it tetracon/pingservices:2.14 sh
-	# stop the container when you are finnished
-	$ docker stop <container-id>
-	$ docker rm <container-id>
-	$ sudo shutdown -h
-	
+# Handy set of docker commands
+
+Under this section we have only collected different docker command we used in the project.
 
 ## Docker exec
 
@@ -293,8 +307,6 @@ So in my case I will enter http://192.168.1.246:4000. If you are in the same sub
 	# shell into the container
 	#remember to comment CMD["./PINGSERVICES"] in file Dockerfile.builder and build a new container
 	$ docker exec -it <container_id> sh 
-
-# Handy set of docker commands
 
 ## docker run images
 	$ # not nessecary if you use docker-compose.yml
@@ -323,6 +335,9 @@ So in my case I will enter http://192.168.1.246:4000. If you are in the same sub
 
 
 # Docker Errors	
+
+In this section we have collected all error we encountered and it´s solutions we found, at least tried.
+
 ## Docker service create error
 
 	$ docker service create --name=pingservices --publish=80:9000 tetracon/pingservices:2.14
@@ -348,7 +363,7 @@ Setting the --with-registry-auth option passes your locally stored credentials t
 
 	$ <user-id>/.ssh		#catalog on Mac
 
-If you're removing hosts from the file, then you can just run the following on the command line
+If you're removing hosts from the file, then you can just run the following in the command line
 
 ==**ssh-keygen -R HOSTNAME**==
 
