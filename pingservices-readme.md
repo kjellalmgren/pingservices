@@ -152,7 +152,7 @@ By starting all RPi-3 (se picture above). The master and each workers. SSH into 
 	rowis32mdry238tejj62e8a8s *  black-pearl64     Ready   Active        Leader
 	w1ljt999az5kb4ffhqjzwt9aw    black-pearl64-w3  Ready   Active
 
-We can se that node black-peasrl64 is the manager. It is possibly to have more manager, not just one. But we are perfectly happy with just one leader.
+We can see that node black-pearl64 is the manager. It is possibly to have more manager, not just one. But we are perfectly happy with just one leader.
 
 	$ docker swarm init
 	Swarm initialized: current node (rowis32mdry238tejj62e8a8s) is now a manager.
