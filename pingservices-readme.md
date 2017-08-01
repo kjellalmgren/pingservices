@@ -32,7 +32,7 @@ For our project we will set the following names for each Raspberry PI 3.
 As you can se in the picture above, hypriotOS 64bit comes with docker 1.13.1 preinstalled.
 
 
-# Build our go program for the right OS and architecture
+# Build our go program for target OS and architecture
 
 To be able to execute our go program in the container based on resin/rpi-raspbian we have to compile for the right target environment. In this case we will set GOOS=linux and GOARCH=arm64.
 
@@ -45,12 +45,11 @@ To be able to execute our go program in the container based on resin/rpi-raspbia
 
 	# pingservices: ELF 64-bit LSB executable, ARM aarch64, version 1 (SYSV), statically linked, stripped
 
-
 # Build our image 
 
-==**Dockerfile.builder**==
+**Dockerfile.builder**
 
-Now we will start to build up our image layer for layer, we start with resin/rpi-raspbian as a base layer. You find this on hub.docker.com. After this you will start adding our go programs all prerequisite, directories and files.
+Now we will start to build up our image layer by layer, we start with resin/rpi-raspbian as our base layer. You find this on hub.docker.com. After this you will start adding our go programs all prerequisite, directories and files.
 
     # -------------------------------------------------
     # FROM resin/rpi-raspbian
@@ -113,7 +112,7 @@ Now we will start to build up our image layer for layer, we start with resin/rpi
     # run it!
     CMD ["./pingservices"]
 
-To build it manually run this command. 
+**To build it manually run this command.**
 
 	$ docker build -f Dockerfile.builder -t pingservices:2.14 .
 	# show the local image
@@ -121,7 +120,7 @@ To build it manually run this command.
 	#REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
 	#tetracon/pingservices        2.14                d9a1ae8eea6a        3 days ago          134MB
 
-At this point you can upload the image to the repository at hub.docker.com.
+**At this point you can upload the image to the repository at hub.docker.com.**
 
 	$ docker login
 	# ...
@@ -144,7 +143,7 @@ By starting all RPi-3 (se picture above). The master and each workers. SSH into 
 
 	#black-pearl64 is the master, to let it be the master i our cluster we initialize it.
 
-To se all machine in the swarm:
+**To se all machine in the swarm:**
 
 	$ docker node ls
 	ID                           HOSTNAME          STATUS  AVAILABILITY  MANAGER STATUS
@@ -156,16 +155,15 @@ To se all machine in the swarm:
 We can se that node black-peasrl64 is the manager. It is possibly to have more manager, not just one. But we are perfectly happy with just one leader.
 
 	$ docker swarm init
-
 	Swarm initialized: current node (rowis32mdry238tejj62e8a8s) is now a manager.
 
-To add a worker to this swarm, run the following command:
+	To add a worker to this swarm, run the following command:
 
     docker swarm join \
     --token SWMTKN-1-2w2uu2rmwhi9eqbqrfn51ak70atlvlaz5fihi8hos3q5hk8o2t-a9rfmy05ak92a3ji6zkzc3v73 \
     192.168.1.246:2377
 
-To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+	To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 
 HypriotOS/arm64: pirate@black-pearl64 in ~
 
@@ -175,15 +173,15 @@ The response from docker is that the swarm has been initilized and is now a mana
 	>     --token SWMTKN-1-2w2uu2rmwhi9eqbqrfn51ak70atlvlaz5fihi8hos3q5hk8o2t-a9rfmy05ak92a3ji6zkzc3v73 \
 	>     192.168.1.246:2377
 
-This node joined a swarm as a worker.
+	This node joined a swarm as a worker.
 
 
 ## Docker swarm visualizer
 
-Alex Ellis has done a create job to helped build a visualizer for ther docker swarm. Get the image from docker hub by executing the following command att the manager machine (master).
+Alex Ellis has done a create job to helped build a visualizer for docker swarms. Get the image from docker hub by executing the following command att the manager machine (master). Alex has a lot of information at github, worth reading.
 
 	$ docker login #obviously...
-	$ docker docker pull alexellis2/visualizer-arm
+	$ docker docker pull alexellis2/visualizer-arm:latest
 	# you can show all images by
 	$ docker images
 	REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
@@ -227,7 +225,7 @@ So in my case I will enter http://192.168.1.246:4000. If you are in the same sub
 
 # Start our newly build image as a service in the cluster
 
-Now when the cluster is up and running we can start our image pingservices as a service at the manager. Start download the image from hub.docker.com. Remember to ssh into the manager when doing this.
+Now when the cluster is up and running we can start our image pingservices as a service at the manager node. Start download the image from hub.docker.com. Remember to ssh into the manager node when doing this.
 
 ## Docker pull images from repository
 	#
@@ -238,7 +236,7 @@ Now when the cluster is up and running we can start our image pingservices as a 
 	tetracon/pingservices       2.14                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	
-To be able to start tetracon/pingservices:2.14 we have to make source that we have a Docker-compose.yaml file at cluster manager.
+To be able to start tetracon/pingservices:2.14 we have to make sure that we have a Docker-compose.yaml file at our cluster manager.
 
 	HypriotOS/arm64: pirate@black-pearl64 in ~
 	$ ls
@@ -272,6 +270,7 @@ If everything working as expcected we should see that pingservices_web is runnin
 	# remove service
 	$ docker service rm pingservices_web
 	
+So our goal is meet, we have a docker swarm cluster up and running on 4 node of RPi-3. If you still has RPi-2 machines Hypriot has a 32-bit arm7 OS with docker 17.05 ce.
 	
 ## Docker-compose.yaml
 
@@ -299,7 +298,7 @@ If everything working as expcected we should see that pingservices_web is runnin
 
 # Handy set of docker commands
 
-Under this section we have only collected different docker command we used in the project.
+In this section we have only collected different docker command we used in the project.
 
 ## Docker exec
 
