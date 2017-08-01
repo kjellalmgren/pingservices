@@ -1,10 +1,10 @@
 # Project Docker container on raspberry PI 3 cluster
 
-We should update this documentation 2017-07-29 Kjell Almgren to be more of a step guide...
+We should update this documentation to be more of a step guide...
 
-## HypriotOS 64bit armv8
+## HypriotOS 64-bits armv8
 
-We will use hypriotOS on all four raspberry PI 3 since after all it is 64 bits. This distribution is prepared with docker 1.13.1 by Dieter Reuter excellent work. You find the image here on github. Follow the instructions by Dieter. I flash this to a SD card using etcher on OSX, that the only differences.
+We will use hypriotOS on all four raspberry PI 3 since after all it is 64 bits. This distribution is prepared with *docker 1.13.1* by Dieter Reuter excellent work. You find the image here on github. Follow the instructions by Dieter. I flash this to a SD card using etcher on OSX, that the only differences.
 
 	image: https://github.com/DieterReuter/image-builder-rpi64/releases/tag/v20170303-185520
 	repo: https://github.com/DieterReuter/image-builder-rpi64
