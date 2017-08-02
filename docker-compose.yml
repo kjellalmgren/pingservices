@@ -2,7 +2,7 @@ version: "3"
 
 services:
   web:
-    image: tetracon/pingservices:2.14
+    image: tetracon/pingservices:2.15
     deploy:
       replicas: 2
       resources:
