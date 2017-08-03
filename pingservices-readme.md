@@ -142,7 +142,7 @@ By starting all RPi-3 (se picture above). The master and each workers. SSH into 
 	$ ssh pirate@black-pearl64-w2.local
 	$ ssh pirate@black-pearl64-w3.local
 
-	#black-pearl64 is the master, to let it be the master i our cluster we initialize it.
+	#black-pearl64 is the manager, to let it be the manager i our cluster we initialize it.
 
 **To se all machine in the swarm:**
 
@@ -168,7 +168,7 @@ We can see that node black-pearl64 is the manager. It is possibly to have more m
 
 HypriotOS/arm64: pirate@black-pearl64 in ~
 
-The response from docker is that the swarm has been initilized and is now a manager. It also stated that we should exec docker swarm join in each worker machine. Copy the text and execute this command in worker machine.
+The response from docker is that the swarm has been initilized and is now a manager. It also stated that we should exec docker swarm join in each worker machine. Copy the text and execute this command in each worker machine.
 
 	$ docker swarm join \
 	>     --token SWMTKN-1-2w2uu2rmwhi9eqbqrfn51ak70atlvlaz5fihi8hos3q5hk8o2t-a9rfmy05ak92a3ji6zkzc3v73 \
@@ -178,7 +178,7 @@ The response from docker is that the swarm has been initilized and is now a mana
 
 ## Docker swarm visualizer
 
-Alex Ellis has done a create job to helped build a visualizer for docker swarms. Get the image from docker hub by executing the following command att the manager machine (master). Alex has a lot of information at github, worth reading.
+Alex Ellis has done a create job to helped build a visualizer for docker swarms. Get the image from docker hub by executing the following command att the manager machine (manager). Alex has a lot of information at github, worth reading.
 
 	$ docker login #obviously...
 	$ docker docker pull alexellis2/visualizer-arm:latest
@@ -242,8 +242,7 @@ To be able to start *tetracon/pingservices:2.14* we have to make sure that we ha
 	$ ls
 	docker-compose.yaml  pingservices
 
-See the *Docker-compose.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and restart-policies.
-
+See the *Docker-compose.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and set restart-policies.
 
 	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
 	# Creating network pingservices_webnet
