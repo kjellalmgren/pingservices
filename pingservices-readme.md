@@ -129,7 +129,7 @@ Now we will start to build up our image layer by layer, we start with **resin/rp
 	$ push tetracon/pingservices:2.14
 	$ docker logout
 
-Tag :2.14 in this case it's just my version number, you can set whatever you want. This is just to tag each image in the your repository.
+Tag :2.14 in this case it's just my version number, you can set whatever you want. This is just to tag each image in your repository.
 
 ## Start the cluster
 By starting all RPi-3 (se picture above). The master and each workers. SSH into each machine.
