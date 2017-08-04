@@ -8,7 +8,7 @@ services:
       # number of instances
       replicas: 4
       update_config:
-        # number of parallel during when doing rolling update
+        # number of parallel service uppdates during rolling update
         parallelism: 1
         # delays between rolling update
         delays: 10s

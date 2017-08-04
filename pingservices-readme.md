@@ -29,7 +29,7 @@ For our project we will set the following names for each Raspberry Pi-3.
 
 ![Rpi-3 Cluster](/images/cluster-cli-01.png)
 
-As you can se in the picture above, hypriotOS 64bit comes with docker 1.13.1 preinstalled.
+As you can se in the picture above, hypriotOS 64bit comes with docker 1.13.1 preinstalled, pretty neat.
 
 
 # Build our go program for target OS and architecture
@@ -236,15 +236,15 @@ Now when the cluster is up and running we can start our image pingservices as a 
 	tetracon/pingservices       2.19                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	
-To be able to start *tetracon/pingservices:2.19* we have to make sure that we have a *Docker-compose.yaml* file at our cluster manager.
+To be able to start *tetracon/pingservices:2.19* we have to make sure that we have a *Docker-stack.yaml* file at our cluster manager.
 
 	HypriotOS/arm64: pirate@black-pearl64 in ~
 	$ ls
-	docker-compose.yaml  pingservices
+	docker-stack.yaml  pingservices
 
-See the *Docker-compose.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and set restart-policies.
+See the *Docker-stack.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and set restart-policies.
 
-	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
+	$ docker stack deploy -c docker-stack.yaml pingservices --with-registry-auth
 	# Creating network pingservices_webnet
 	# Creating service pingservices_web
 
@@ -268,31 +268,48 @@ If everything working as expcected we should see that **pingservices_web** is ru
 	
 	# remove service
 	$ docker service rm pingservices_web
+
+# Continues Deployment thru docker rolling updates
+It´s possibly to update to a new image and make a rolling update of all running services. This is helpful when you don´t want any down-time. Rolling update take down all services gracefully and start new services by just change values in *docker-stack.yaml*.
+
+Following config participant in CD pipeline
+	update_config:
+	# number of parallel service uppdates during rolling update
+    parallelism: 1
+    # delays between rolling update
+    delays: 10s
+
 	
 So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of RPi-3. If you still has RPi-2 machines Hypriot has a 32-bit arm7 OS with docker 17.05 ce.
 	
-## Docker-compose.yaml
+## Docker-stack.yaml
 
 	version: "3"
 
 	services:
-  	web:
-    image: tetracon/pingservices:2.19
-    deploy:
-      replicas: 4
-      resources:
-        limits:
-          cpus: "0.9"
-          memory: 50M
-      restart_policy:
-        condition: on-failure
-    ports:
-      - "80:9000"
+  	  web:
+        image: tetracon/pingservices:2.19
+        deploy:
+          mode: replicated
+          # number of instances
+          replicas: 4
+          update_config:
+            # number of parallel during when doing rolling update
+            parallelism: 1
+            # delays between rolling update
+            delays: 10s
+          resources:
+            limits:
+              cpus: "0.2"
+              memory: 50M
+          restart_policy:
+            condition: on-failure
+        ports:
+          - "80:9000"
+        networks:
+          - webnet
     networks:
-     - webnet:
-   	networks:
-     webnet:
-
+      webnet:
 
 
 # Handy set of docker commands
@@ -328,12 +345,15 @@ In this section we have only collected different docker command we used in the p
 ## Rolling updates (use docker-compose.yaml instead)
 	# Update to a new image
 	$ docker service update --image tetracon/pingservices:2.18 pingservices_web
+	$ docker stack deploy -c docker-stack.yaml pingservices --with-registry-auth
+	$ docker service ps pingservices_web -f desired-state=shutdown
+	$ docker service ps pingservices_web -f desired-state=running
+	# watch for evry 2s
+	$ watch docker service ps pingservices_web
 
 ## Remove all stopped containers
 	$ docker rm $(docker ps -q -f status=exited)
-	$ docker service ps -f "desired-state=shutdown" pingservices_web
-	$ docker service ps pingservices_web -f desired-state=shutdown
-	$ docker service ps pingservices_web -f desired-state=running
+	# list services with filtering
 	$ docker service rm $(docker service ps -q -f "desired-state=shutdown" pingservices_web)
 
 
