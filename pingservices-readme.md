@@ -114,22 +114,22 @@ Now we will start to build up our image layer by layer, we start with **resin/rp
 
 **To build it manually run docker build command**
 
-	$ docker build -f Dockerfile.builder -t pingservices:2.18 .
+	$ docker build -f Dockerfile.builder -t pingservices:2.19 .
 	# If build succeded you will se the image in the repository. In this case a compiled it under Mac OSX so the image will be at the host environment.
 
 	$ docker images
 	#REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
-	#tetracon/pingservices        2.18                d9a1ae8eea6a        3 days ago          134MB
+	#tetracon/pingservices        2.19                d9a1ae8eea6a        3 days ago          134MB
 
 **At this point you can upload the image to the repository at hub.docker.com.**
 
 	$ docker login
 	# ...
 	# push the image to "your" repository. push repository/name:tag
-	$ push tetracon/pingservices:2.18
+	$ push tetracon/pingservices:2.19
 	$ docker logout
 
-Tag :2.18 in this case it's just my version number, you can set whatever you want. This is just to tag each image in your repository.
+Tag :2.19 in this case it's just my version number, you can set whatever you want. This is just to tag each image in your repository.
 
 ## Start the cluster
 By starting all RPi-3 (se picture above). The master and each workers. SSH into each machine.
@@ -185,7 +185,7 @@ Alex Ellis has done a create job to helped build a visualizer for docker swarms.
 	# you can show all images by
 	$ docker images
 	**REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE**
-	tetracon/pingservices       2.18                d9a1ae8eea6a        3 days ago          134 MB
+	tetracon/pingservices       2.19                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	$
 
@@ -230,13 +230,13 @@ Now when the cluster is up and running we can start our image pingservices as a 
 ## Docker pull images from repository
 	#
 	$ docker login
-	$ docker pull tetracon/pingservices:2.18
+	$ docker pull tetracon/pingservices:2.19
 	$ docker images
 	REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
-	tetracon/pingservices       2.18                d9a1ae8eea6a        3 days ago          134 MB
+	tetracon/pingservices       2.19                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	
-To be able to start *tetracon/pingservices:2.18* we have to make sure that we have a *Docker-compose.yaml* file at our cluster manager.
+To be able to start *tetracon/pingservices:2.19* we have to make sure that we have a *Docker-compose.yaml* file at our cluster manager.
 
 	HypriotOS/arm64: pirate@black-pearl64 in ~
 	$ ls
@@ -256,15 +256,15 @@ If everything working as expcected we should see that **pingservices_web** is ru
 
 	$ docker service ps pingservices_web
 	ID            NAME                IMAGE                       NODE              DESIRED STATE  CURRENT STATE           ERROR  PORTS
-	syvggmd4k4yk  pingservices_web.1  tetracon/pingservices:2.14  black-pearl64-w1  Running        Running 10 minutes ago
-	uhu2uhx4qu39  pingservices_web.2  tetracon/pingservices:2.14  black-pearl64-w2  Running        Running 10 minutes ago
-	ihdf9pdkxoox  pingservices_web.3  tetracon/pingservices:2.14  black-pearl64     Running        Running 8 minutes ago
-	sl59vluarf1s  pingservices_web.4  tetracon/pingservices:2.14  black-pearl64-w3  Running        Running 8 minutes ago
+	syvggmd4k4yk  pingservices_web.1  tetracon/pingservices:2.19  black-pearl64-w1  Running        Running 10 minutes ago
+	uhu2uhx4qu39  pingservices_web.2  tetracon/pingservices:2.19  black-pearl64-w2  Running        Running 10 minutes ago
+	ihdf9pdkxoox  pingservices_web.3  tetracon/pingservices:2.19  black-pearl64     Running        Running 8 minutes ago
+	sl59vluarf1s  pingservices_web.4  tetracon/pingservices:2.19  black-pearl64-w3  Running        Running 8 minutes ago
 
 	$ docker service ls
 	ID            NAME              MODE        REPLICAS  IMAGE
 	dgnn2ntd3ozo  viz               replicated  1/1       alexellis2/visualizer-arm:latest
-	oahpsvaugvl9  pingservices_web  replicated  4/4       tetracon/pingservices:2.14
+	oahpsvaugvl9  pingservices_web  replicated  4/4       tetracon/pingservices:2.19
 	
 	# remove service
 	$ docker service rm pingservices_web
@@ -277,12 +277,12 @@ So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of
 
 	services:
   	web:
-    image: tetracon/pingservices:2.18
+    image: tetracon/pingservices:2.19
     deploy:
       replicas: 4
       resources:
         limits:
-          cpus: "0.1"
+          cpus: "0.9"
           memory: 50M
       restart_policy:
         condition: on-failure
@@ -331,6 +331,9 @@ In this section we have only collected different docker command we used in the p
 ## Entirely wipe out all containers
 	$ docker rm $(docker ps -a -q)
 
+## Remove services
+	# Remove all pingservices_web services
+	$ docker service rm pingservices_web
 
 # Docker Errors	
 
