@@ -114,22 +114,22 @@ Now we will start to build up our image layer by layer, we start with **resin/rp
 
 **To build it manually run docker build command**
 
-	$ docker build -f Dockerfile.builder -t pingservices:2.17 .
+	$ docker build -f Dockerfile.builder -t pingservices:2.18 .
 	# If build succeded you will se the image in the repository. In this case a compiled it under Mac OSX so the image will be at the host environment.
 
 	$ docker images
 	#REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
-	#tetracon/pingservices        2.17                d9a1ae8eea6a        3 days ago          134MB
+	#tetracon/pingservices        2.18                d9a1ae8eea6a        3 days ago          134MB
 
 **At this point you can upload the image to the repository at hub.docker.com.**
 
 	$ docker login
 	# ...
 	# push the image to "your" repository. push repository/name:tag
-	$ push tetracon/pingservices:2.17
+	$ push tetracon/pingservices:2.18
 	$ docker logout
 
-Tag :2.17 in this case it's just my version number, you can set whatever you want. This is just to tag each image in your repository.
+Tag :2.18 in this case it's just my version number, you can set whatever you want. This is just to tag each image in your repository.
 
 ## Start the cluster
 By starting all RPi-3 (se picture above). The master and each workers. SSH into each machine.
@@ -185,7 +185,7 @@ Alex Ellis has done a create job to helped build a visualizer for docker swarms.
 	# you can show all images by
 	$ docker images
 	**REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE**
-	tetracon/pingservices       2.17                d9a1ae8eea6a        3 days ago          134 MB
+	tetracon/pingservices       2.18                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	$
 
@@ -230,13 +230,13 @@ Now when the cluster is up and running we can start our image pingservices as a 
 ## Docker pull images from repository
 	#
 	$ docker login
-	$ docker pull tetracon/pingservices:2.17
+	$ docker pull tetracon/pingservices:2.18
 	$ docker images
 	REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE
-	tetracon/pingservices       2.17                d9a1ae8eea6a        3 days ago          134 MB
+	tetracon/pingservices       2.18                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	
-To be able to start *tetracon/pingservices:2.17* we have to make sure that we have a *Docker-compose.yaml* file at our cluster manager.
+To be able to start *tetracon/pingservices:2.18* we have to make sure that we have a *Docker-compose.yaml* file at our cluster manager.
 
 	HypriotOS/arm64: pirate@black-pearl64 in ~
 	$ ls
@@ -277,7 +277,7 @@ So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of
 
 	services:
   	web:
-    image: tetracon/pingservices:2.17
+    image: tetracon/pingservices:2.18
     deploy:
       replicas: 4
       resources:
@@ -338,11 +338,11 @@ In this section we have collected all error we encountered and it´s solutions w
 
 ## Docker service create error
 
-	$ docker service create --name=pingservices --publish=80:9000 tetracon/pingservices:2.14
+	$ docker service create --name=pingservices --publish=80:9000 tetracon/pingservices:2.18
 	
 ==ERROR==
 
-**image tetracon/pingservices:2.17 could not be accessed on a registry to record its digest. Each node will access tetracon/pingservices:2.17 independently, possibly leading to different nodes running different
+**image tetracon/pingservices:2.18 could not be accessed on a registry to record its digest. Each node will access tetracon/pingservices:2.17 independently, possibly leading to different nodes running different
 versions of the image.**
 
 This is solved by using ==**--with-registry-auth**== as a argument to docker service create

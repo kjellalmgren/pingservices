@@ -133,7 +133,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 //	Build list array to ping execute (Pings)
 //
 func (pings *MyPinglists) AddItem(ping Ping) []Ping {
-	pings.Hostname = GetHostname()
+	pings.Hostname = ""
 	pings.Pings = append(pings.Pings, ping)
 	return pings.Pings
 }
@@ -215,6 +215,7 @@ func PingQAHandler(w http.ResponseWriter, r *http.Request) {
 			i.AddItem(ping)
 		}
 	}
+	i.Hostname = GetHostname()
 	//
 	err := tpl.ExecuteTemplate(w, "index-qa.html", i)
 	if err != nil {
@@ -298,6 +299,7 @@ func PingPRODHandler(w http.ResponseWriter, r *http.Request) {
 			i.AddItem(ping)
 		}
 	}
+	i.Hostname = GetHostname()
 	//
 	err := tpl.ExecuteTemplate(w, "index-prod.html", i)
 	if err != nil {
