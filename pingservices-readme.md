@@ -332,8 +332,10 @@ In this section we have only collected different docker command we used in the p
 ## Remove all stopped containers
 	$ docker rm $(docker ps -q -f status=exited)
 	$ docker service ps -f "desired-state=shutdown" pingservices_web
+	$ docker service ps pingservices_web -f desired-state=shutdown
+	$ docker service ps pingservices_web -f desired-state=running
 	$ docker service rm $(docker service ps -q -f "desired-state=shutdown" pingservices_web)
-	
+
 
 ## Entirely wipe out all containers
 	$ docker rm $(docker ps -a -q)
