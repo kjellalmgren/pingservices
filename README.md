@@ -290,7 +290,13 @@ Following config participant in CD pipeline
     parallelism: 1
     # delays between rolling update
     delays: 10s
-	
+
+Yuo can for example build a new image and change docker-stack.yaml with the new image tag and just execute docker stack deploy... again.
+
+    $ docker stack deploy -c docker-stack.yaml pingservices --with-registry-auth
+    # docker will replay by : **Updating service pingservices_web (id: pb8q4bklshk1uyf22i2fil1ld)**
+
+
 So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of RPi-3. If you still has RPi-2 machines Hypriot has a 32-bit arm7 OS with docker 17.05 ce.
 	
 ## Docker-stack.yaml
