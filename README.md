@@ -284,12 +284,12 @@ If everything working as expcected we should see that **pingservices_web** is ru
 It´s possibly to update to a new image and make a rolling update of all running services. This is helpful when you don´t want any down-time. Rolling update take down all services gracefully and start new services by just change values in *docker-stack.yaml*.
 
 Following config participant in CD pipeline
+
 	update_config:
 	# number of parallel service uppdates during rolling update
     parallelism: 1
     # delays between rolling update
     delays: 10s
-
 	
 So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of RPi-3. If you still has RPi-2 machines Hypriot has a 32-bit arm7 OS with docker 17.05 ce.
 	
