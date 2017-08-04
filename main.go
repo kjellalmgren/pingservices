@@ -57,7 +57,8 @@ type Ping struct {
 
 //
 type MyPinglists struct {
-	Pings []Ping
+	Hostname string
+	Pings    []Ping
 }
 
 //
@@ -132,6 +133,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 //	Build list array to ping execute (Pings)
 //
 func (pings *MyPinglists) AddItem(ping Ping) []Ping {
+	pings.Hostname = GetHostname()
 	pings.Pings = append(pings.Pings, ping)
 	return pings.Pings
 }
@@ -156,8 +158,10 @@ func PingQAHandler(w http.ResponseWriter, r *http.Request) {
 		os.Exit(1)
 	}
 
-	pings := []Ping{} // Initilze
-	i := MyPinglists{pings}
+	// init struct, also init hostname
+	pings := []Ping{} // Initialize
+	i := MyPinglists{GetHostname(), pings}
+	fmt.Printf("Hostname Kjell: %s", i.Hostname)
 	//
 	for key := range services {
 
@@ -212,7 +216,7 @@ func PingQAHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	//
-	err := tpl.ExecuteTemplate(w, "index-qa.html", i.Pings)
+	err := tpl.ExecuteTemplate(w, "index-qa.html", i)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -238,9 +242,10 @@ func PingPRODHandler(w http.ResponseWriter, r *http.Request) {
 		os.Exit(1)
 	}
 
-	pings := []Ping{} // Initilze
-	i := MyPinglists{pings}
+	pings := []Ping{} // Initialize
+	i := MyPinglists{GetHostname(), pings}
 	//
+	fmt.Printf("Hostname Kjell: %s", i.Hostname)
 	for key := range services {
 
 		fmt.Printf("Processing target (")
@@ -294,7 +299,7 @@ func PingPRODHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	//
-	err := tpl.ExecuteTemplate(w, "index-prod.html", i.Pings)
+	err := tpl.ExecuteTemplate(w, "index-prod.html", i)
 	if err != nil {
 		log.Fatal(err)
 	}

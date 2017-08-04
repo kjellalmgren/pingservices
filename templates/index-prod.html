@@ -60,8 +60,11 @@
         <h1>IT-Stöd och tjänster</h1>
         {{template "version"}}
     </div>
+    <div>
+      <h4>Hostname: {{.Hostname}}</h4>
+    </div>
     <div class="row">
-        {{range .}}
+        {{range .Pings}}
         {{if .Ping}}
         <div class="col-sm-4">
           <div class="panel panel-success">
