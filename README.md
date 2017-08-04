@@ -286,7 +286,7 @@ It´s possibly to update to a new image and make a rolling update of all running
 Following config participant in CD pipeline
 
 	update_config:
-	# number of parallel service uppdates during rolling update
+	# number of parallel service updates during rolling update
     parallelism: 1
     # delays between rolling update
     delays: 10s
@@ -305,7 +305,7 @@ So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of
           # number of instances
           replicas: 4
           update_config:
-            # number of parallel during when doing rolling update
+            # number of parallel service updates during rolling update
             parallelism: 1
             # delays between rolling update
             delays: 10s
@@ -411,8 +411,5 @@ If you're removing hosts from the file, then you can just run the following in t
 You can search for a hostname with
 
 ==**ssh-keygen -F HOSTNAME**==
-
-* [RPi-3 Workshop and docker swarm](pingservices-readme.md)
-
 
 
