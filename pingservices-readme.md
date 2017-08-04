@@ -325,8 +325,15 @@ In this section we have only collected different docker command we used in the p
 	# remove images
 	$ docker rmi <IMAGE ID> 
 
+## Rolling updates (use docker-compose.yaml instead)
+	# Update to a new image
+	$ docker service update --image tetracon/pingservices:2.18 pingservices_web
+
 ## Remove all stopped containers
 	$ docker rm $(docker ps -q -f status=exited)
+	$ docker service ps -f "desired-state=shutdown" pingservices_web
+	$ docker service rm $(docker service ps -q -f "desired-state=shutdown" pingservices_web)
+	
 
 ## Entirely wipe out all containers
 	$ docker rm $(docker ps -a -q)
