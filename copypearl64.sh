@@ -6,6 +6,5 @@ scp -rp ~/Documents/gorep/src/pingservices/main.css pirate@black-pearl64.local:p
 scp -rp ~/Documents/gorep/src/pingservices/services-prod.json pirate@black-pearl64.local:pingservices/services-prod.json
 scp -rp ~/Documents/gorep/src/pingservices/services-qa.json pirate@black-pearl64.local:pingservices/services-qa.json
 scp -rp ~/Documents/gorep/src/pingservices/pingservices pirate@black-pearl64.local:pingservices/pingservices
-
 scp -rp ~/Documents/gorep/src/pingservices/docker-stack-pingservices.yaml pirate@black-pearl64.local:docker-stack-pingservices.yaml
 scp -rp ~/Documents/gorep/src/pingservices/docker-stack-vlz.yaml pirate@black-pearl64.local:docker-stack-vlz.yaml
