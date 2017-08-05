@@ -11,7 +11,7 @@ services:
         # number of parallel service uppdates during rolling update
         parallelism: 1
         # delays between rolling update
-        delays: 10s
+        delay: 10s
       resources:
         limits:
           cpus: "0.2"
@@ -23,4 +23,4 @@ services:
     networks:
       - webnet
 networks:
-  webnet:
+    webnet:

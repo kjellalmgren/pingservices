@@ -204,8 +204,28 @@ You find more information at https://github.com/dockersamples/docker-swarm-visua
 
 Should be run in the swarm manager, remember to login to hub.docker.com	
 
+	<!-- docker-stack-vlz.yaml -->
+	version: "3"
+
+	services:
+      web:
+        image: alexellis2/visualizer-arm:latest
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      deploy:
+        placement:
+          constraints: [node.role == manager]
+      ports:
+        - 4000:8080
+
 	<!-- -->
-	
+
+	$ docker stack deploy -f dockewr-stack-vlz.yaml vlz --with-registry-auth
+
+	<!-- -->
+
+	<!-- this "docker service create .. can be skipped if you use docker-stack-vlz.yaml above -->
+
 	$ docker service create \
 	  --name=viz \
  	 --publish=4000:8080/tcp \
@@ -213,7 +233,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
   		--mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
   	alexellis2/visualizer-arm:latest
   	
-	$ docker service ps viz
+	$ docker service ps viz_web
 	#ID            NAME   IMAGE                            NODE           DESIRED STATE  CURRENT STATE          ERROR  PORTS
 	whpy9vnpgseg  viz.1  alexellis2/visualizer-arm:latest  black-pearl64  Running        Running 9 seconds ago
   	<!-- -->
@@ -247,15 +267,15 @@ Now when the cluster is up and running we can start our image pingservices as a 
 	tetracon/pingservices       2.19                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	
-To be able to start *tetracon/pingservices:2.19* we have to make sure that we have a *Docker-stack.yaml* file at our cluster manager.
+To be able to start *tetracon/pingservices:2.19* we have to make sure that we have a *Docker-stack-pingservices.yaml* file at our cluster manager.
 
 	HypriotOS/arm64: pirate@black-pearl64 in ~
 	$ ls
-	docker-stack.yaml  pingservices
+	docker-stack-pingservices.yaml  docker-stack-vlz.yaml pingservices
 
-See the *Docker-stack.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and set restart-policies.
+See the *Docker-stack-pingservices.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and set restart-policies.
 
-	$ docker stack deploy -c docker-stack.yaml pingservices --with-registry-auth
+	$ docker stack deploy -c docker-stack-pingservices.yaml pingservices --with-registry-auth
 	# Creating network pingservices_webnet
 	# Creating service pingservices_web
 
@@ -274,14 +294,15 @@ If everything working as expcected we should see that **pingservices_web** is ru
 
 	$ docker service ls
 	ID            NAME              MODE        REPLICAS  IMAGE
-	dgnn2ntd3ozo  viz               replicated  1/1       alexellis2/visualizer-arm:latest
+	dgnn2ntd3ozo  viz_web           replicated  1/1       alexellis2/visualizer-arm:latest
 	oahpsvaugvl9  pingservices_web  replicated  4/4       tetracon/pingservices:2.19
 	
 	# remove service
 	$ docker service rm pingservices_web
+	$ docker service rm vlz_web
 
 # Continues Deployment thru docker rolling updates
-It´s possibly to update to a new image and make a rolling update of all running services. This is helpful when you don´t want any down-time. Rolling update take down all services gracefully and start new services by just change values in *docker-stack.yaml*.
+It´s possibly to update to a new image and make a rolling update of all running services. This is helpful when you don´t want any down-time. Rolling update take down all services gracefully and start new services by just change values in *docker-stack-pingservices.yaml*.
 
 Following config participant in CD pipeline
 
@@ -334,14 +355,13 @@ So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of
 In this section we have only collected different docker command we used in the project.
 
 ## Docker exec
-
 	$ docker ps # to find out container id
 	# shell into the container
 	#remember to comment CMD["./PINGSERVICES"] in file Dockerfile.builder and build a new container
 	$ docker exec -it <container_id> sh 
 
 ## docker run images
-	$ # not nessecary if you use docker-compose.yml
+	$ # not nessecary if you use docker-stack-pingservices.yml
 	$ docker run --publish 8443:8443 --name pingservices -t pingservices
 
 ## stop container
@@ -359,10 +379,10 @@ In this section we have only collected different docker command we used in the p
 	# remove images
 	$ docker rmi <IMAGE ID> 
 
-## Rolling updates (use docker-compose.yaml instead)
+## Rolling updates (use docker-stack-pingservices.yaml instead)
 	# Update to a new image
 	$ docker service update --image tetracon/pingservices:2.18 pingservices_web
-	$ docker stack deploy -c docker-stack.yaml pingservices --with-registry-auth
+	$ docker stack deploy -c docker-stack-pingservices.yaml pingservices --with-registry-auth
 	$ docker service ps pingservices_web -f desired-state=shutdown
 	$ docker service ps pingservices_web -f desired-state=running
 	# watch for evry 2s
