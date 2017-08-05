@@ -205,7 +205,7 @@ Alex Ellis has done a create job to helped build a visualizer for docker swarms.
 
 You find more information at https://github.com/dockersamples/docker-swarm-visualizer
 
-Should be run in the swarm manager, this is done with constraints, node.role == manager.
+The visualizer should be run at the swarm manager, this is done with constraints, node.role == manager.
 
 	<!-- docker-stack-vlz.yaml -->
 	version: "3"
@@ -223,7 +223,7 @@ Should be run in the swarm manager, this is done with constraints, node.role == 
 
 	<!-- -->
 
-To setup the vlz services thru docker-stack-vlz.yaml
+To setup the vlz services thru docker-stack-vlz.yaml. From docker 1.13 it's possibly to use .yaml files with docker stack command.
 
 		$ docker stack deploy -f docker-stack-vlz.yaml vlz --with-registry-auth
 
@@ -326,6 +326,8 @@ Yuo can for example build a new image and change docker-stack.yaml with the new 
 So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of RPi-3. If you still has RPi-2 machines Hypriot has a 32-bit arm7 OS with docker 17.05 ce.
 	
 ## Docker-stack-pingservices.yaml
+
+To setup the ping services thru docker-stack-pingservices.yaml. From docker 1.13 it's possibly to use .yaml files with docker stack command.
 
 	version: "3"
 
