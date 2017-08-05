@@ -10,10 +10,11 @@ In this short summer project we are going to setup a docker swarm cluster using 
 # Project Docker container on raspberry PI 3 cluster
 
 Goal:
-* Docker cluster
-* Docker stack
+* Setup a Docker swarm cluster
+* Install two services, vizualizer and a simple pingservices in go
 * Docker rolling updates
-    
+
+If we have the time we will look into Continues Integration. At this point I haven´t desided if a should go with Travis CI or Jenkins.
 
 ## HypriotOS 64-bits armv8
 
@@ -33,9 +34,9 @@ When you boot up the server on raspberry pi 3 it's going to have a hostname of *
 
 Repeat the above steps for each RPi-3.
 
-For our project we will set the following names for each Raspberry Pi-3.
+For our project we will set the following hostnames for each Raspberry Pi-3.
 
-* Master: black-pearl64
+* Manager: black-pearl64
 * Worker1: black-pearl64-w1
 * Worker2: black-pearl64-w2
 * Worker3: black-pearl64-w3
@@ -204,7 +205,7 @@ Alex Ellis has done a create job to helped build a visualizer for docker swarms.
 
 You find more information at https://github.com/dockersamples/docker-swarm-visualizer
 
-Should be run in the swarm manager, remember to login to hub.docker.com	
+Should be run in the swarm manager, this is done with constraints, node.role == manager.
 
 	<!-- docker-stack-vlz.yaml -->
 	version: "3"
@@ -222,11 +223,11 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 
 	<!-- -->
 
-	$ docker stack deploy -f dockewr-stack-vlz.yaml vlz --with-registry-auth
+	$ docker stack deploy -f docker-stack-vlz.yaml vlz --with-registry-auth
 
 	<!-- -->
 
-	<!-- this "docker service create .. can be skipped if you use docker-stack-vlz.yaml above -->
+	<!-- this "docker service create .. can be skipped if you use docker-stack-vlz.yaml from above -->
 
 	$ docker service create \
 	  --name=viz \
@@ -240,7 +241,7 @@ Should be run in the swarm manager, remember to login to hub.docker.com
 	whpy9vnpgseg  viz.1  alexellis2/visualizer-arm:latest  black-pearl64  Running        Running 9 seconds ago
   	<!-- -->
 
-To show the visualizer in your web-browser you can point the browser to *"http://ip-adr-to-master:4000"*. To find out ip-adr for your manager use:
+To show the visualizer in your web-browser you can point the browser to *"http://ip-adr-to-manager:4000"*. To find out ip-adr for your manager use:
 
 	$ ifconfig eth0 (in my case)
 	eth0      Link encap:Ethernet  HWaddr b8:27:eb:6a:ae:d9
@@ -269,13 +270,13 @@ Now when the cluster is up and running we can start our image pingservices as a 
 	tetracon/pingservices       2.19                d9a1ae8eea6a        3 days ago          134 MB
 	alexellis2/visualizer-arm   latest              7ca521114569        2 months ago        416 MB
 	
-To be able to start *tetracon/pingservices:2.19* we have to make sure that we have a *Docker-stack-pingservices.yaml* file at our cluster manager.
+To be able to start *tetracon/pingservices:2.19* we have to make sure that we have a *docker-stack-pingservices.yaml* file at our cluster manager.
 
 	HypriotOS/arm64: pirate@black-pearl64 in ~
 	$ ls
 	docker-stack-pingservices.yaml  docker-stack-vlz.yaml pingservices
 
-See the *Docker-stack-pingservices.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and set restart-policies.
+See the *docker-stack-pingservices.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and set restart-policies.
 
 	$ docker stack deploy -c docker-stack-pingservices.yaml pingservices --with-registry-auth
 	# Creating network pingservices_webnet
@@ -312,17 +313,17 @@ Following config participant in CD pipeline
 	# number of parallel service updates during rolling update
     parallelism: 1
     # delays between rolling update
-    delays: 10s
+    delay: 10s
 
 Yuo can for example build a new image and change docker-stack.yaml with the new image tag and just execute docker stack deploy... again.
 
-    $ docker stack deploy -c docker-stack.yaml pingservices --with-registry-auth
+    $ docker stack deploy -c docker-stack-pingservices.yaml pingservices --with-registry-auth
     # docker will replay by : **Updating service pingservices_web (id: pb8q4bklshk1uyf22i2fil1ld)**
 
 
 So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of RPi-3. If you still has RPi-2 machines Hypriot has a 32-bit arm7 OS with docker 17.05 ce.
 	
-## Docker-stack.yaml
+## Docker-stack-pingservices.yaml
 
 	version: "3"
 
@@ -337,7 +338,7 @@ So our goal is meet, we have a docker swarm cluster up and running on 4 nodes of
             # number of parallel service updates during rolling update
             parallelism: 1
             # delays between rolling update
-            delays: 10s
+            delay: 10s
           resources:
             limits:
               cpus: "0.2"
