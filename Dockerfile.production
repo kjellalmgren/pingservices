@@ -1,4 +1,5 @@
 # start with a scratch (no layers)
+#This file is not used
 #FROM scratch
 FROM scratch
 # copy our static linked library
