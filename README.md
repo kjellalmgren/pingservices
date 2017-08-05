@@ -223,11 +223,13 @@ Should be run in the swarm manager, this is done with constraints, node.role == 
 
 	<!-- -->
 
-	$ docker stack deploy -f docker-stack-vlz.yaml vlz --with-registry-auth
+To setup the vlz services thru docker-stack-vlz.yaml
+
+		$ docker stack deploy -f docker-stack-vlz.yaml vlz --with-registry-auth
+
+this "docker service create .. can be skipped if you use docker-stack-vlz.yaml from above -->
 
 	<!-- -->
-
-	<!-- this "docker service create .. can be skipped if you use docker-stack-vlz.yaml from above -->
 
 	$ docker service create \
 	  --name=viz \
