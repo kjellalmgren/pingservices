@@ -23,6 +23,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/gorilla/mux"
@@ -86,14 +87,13 @@ func main() {
 	//
 	router := mux.NewRouter()
 	router.HandleFunc("/health-check", HealthCheckHandler).Methods("GET")
-	router.HandleFunc("/pingqa", PingQAHandler).Methods("GET")
-	router.HandleFunc("/pingprod", PingPRODHandler).Methods("GET")
+	router.HandleFunc("/pingqa", PingHandler).Methods("GET")
+	router.HandleFunc("/pingprod", PingHandler).Methods("GET")
 
-	//default entry point set to prod
-	router.HandleFunc("/ping", PingPRODHandler).Methods("GET")
 	router.PathPrefix("/images/").Handler(http.StripPrefix("/images/", http.FileServer(http.Dir("images"))))
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	router.PathPrefix("/dist/").Handler(http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
+	//http.Handle("/", router)
 
 	err := http.ListenAndServe(":9000", router)
 	if err != nil {
@@ -139,96 +139,28 @@ func (pings *MyPinglists) AddItem(ping Ping) []Ping {
 }
 
 //
-//	PingQAHandler
-//
-func PingQAHandler(w http.ResponseWriter, r *http.Request) {
+// handler pingqa and pingprod requests
+func PingHandler(w http.ResponseWriter, r *http.Request) {
 
-	filePath := "./services-qa.json"
-	file, err1 := ioutil.ReadFile(filePath)
-	if err1 != nil {
-		fmt.Printf("Error reading configuration file %s\r\n", filePath)
-		fmt.Printf("File error: %v\r\n", err1)
-		os.Exit(1)
+	filePath := ""
+	param := strings.Split(r.URL.Path, "/")
+	fmt.Printf("Len=%d", len(param))
+	par := ""
+	if len(param) == 2 {
+		par = param[1]
 	}
-	var services []service
-	err2 := json.Unmarshal(file, &services)
-	if err2 != nil {
-		fmt.Printf("JSON marshal Error: %s\r\n", err2)
-		fmt.Printf("Check %s for JSON typing error\r\n", filePath)
-		os.Exit(1)
+	//if par == "" {
+	//	par = "pingprod"
+	//}
+	fmt.Printf("p=%s /r/n", par)
+
+	if strings.Contains(par, "pingprod") {
+		filePath = "./services-prod.json"
+	} else if strings.Contains(par, "pingqa") {
+		filePath = "./services-qa.json"
 	}
 
-	// init struct, also init hostname
-	pings := []Ping{} // Initialize
-	i := MyPinglists{GetHostname(), pings}
-	fmt.Printf("Hostname Kjell: %s", i.Hostname)
-	//
-	for key := range services {
-
-		fmt.Printf("Processing target (")
-		color.Set(color.FgHiWhite)
-		fmt.Printf("%s", services[key].Target)
-		color.Unset()
-		fmt.Printf(") url ")
-		color.Set(color.FgHiWhite)
-		fmt.Printf("%s - ", services[key].Urlstring)
-		color.Unset()
-		httpcode, err := PingExec(services[key].Target, services[key].Urlstring)
-		if err == nil {
-			if httpcode == 200 {
-				color.Set(color.FgHiGreen)
-				fmt.Printf("%d", httpcode)
-				color.Unset()
-				fmt.Printf(" OK\r\n")
-				ping := Ping{services[key].Target, services[key].Environment, services[key].Urlstring, services[key].Contact, services[key].Email, services[key].Phone, true, "OK", httpcode}
-				i.AddItem(ping)
-			}
-		}
-		if httpcode == 418 {
-			//color.Set(color.FgYellow)
-			//fmt.Printf(" %s", ping.Errstring)
-			//fmt.Println("")
-			//color.Unset()
-			ping := Ping{services[key].Target, services[key].Environment, services[key].Urlstring, services[key].Contact, services[key].Email, services[key].Phone, true, "OK", httpcode}
-			//items := []Test{}
-			//tests = MyTests{items}
-			//i := MyInventories{inventories}
-			i.AddItem(ping)
-		}
-		if httpcode == 401 {
-			fmt.Printf("service ")
-			color.Set(color.FgHiRed)
-			fmt.Printf(" %s", services[key].Target)
-			color.Unset()
-			fmt.Printf(" received 401\r\n")
-			ping := Ping{services[key].Target, services[key].Environment, services[key].Urlstring, services[key].Contact, services[key].Email, services[key].Phone, false, "Unauthorized access", httpcode}
-			i.AddItem(ping)
-		}
-		if httpcode >= 500 {
-			fmt.Printf("service ")
-			color.Set(color.FgHiRed)
-			fmt.Printf("%s", services[key].Target)
-			color.Unset()
-			fmt.Printf(" unavailable\r\n")
-			color.Unset()
-			ping := Ping{services[key].Target, services[key].Environment, services[key].Urlstring, services[key].Contact, services[key].Email, services[key].Phone, false, "Unavailable", httpcode}
-			i.AddItem(ping)
-		}
-	}
-	i.Hostname = GetHostname()
-	//
-	err := tpl.ExecuteTemplate(w, "index-qa.html", i)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-//
-//	PingPRODHandler
-//
-func PingPRODHandler(w http.ResponseWriter, r *http.Request) {
-
-	filePath := "./services-prod.json"
+	//filePath := "./services-prod.json"
 	file, err1 := ioutil.ReadFile(filePath)
 	if err1 != nil {
 		fmt.Printf("Error reading configuration file %s\r\n", filePath)
@@ -301,7 +233,13 @@ func PingPRODHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	i.Hostname = GetHostname()
 	//
-	err := tpl.ExecuteTemplate(w, "index-prod.html", i)
+	wpage := ""
+	if strings.Contains(par, "pingprod") {
+		wpage = "index-prod.html"
+	} else if strings.Contains(par, "pingqa") {
+		wpage = "index-qa.html"
+	}
+	err := tpl.ExecuteTemplate(w, wpage, i)
 	if err != nil {
 		log.Fatal(err)
 	}
