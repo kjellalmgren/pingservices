@@ -128,7 +128,7 @@ Now we will start to build up our image layer by layer, we start with **resin/rp
 
 **To build it manually run docker build command**
 
-	$ docker build -f Dockerfile.builder -t pingservices:2.19 .
+	$ docker build -f Dockerfile.builder -t tetracon/pingservices:2.19 .
 	# If build succeded you will se the image in the repository. In this case a compiled it under Mac OSX so the image will be at the host environment.
 
 	$ docker images
