@@ -139,21 +139,19 @@ func (pings *MyPinglists) AddItem(ping Ping) []Ping {
 }
 
 //
-// handler pingqa and pingprod requests
+// handler for ping requests
 func PingHandler(w http.ResponseWriter, r *http.Request) {
 
 	filePath := ""
 	param := strings.Split(r.URL.Path, "/")
+	//fmt.Printf("URL=%s /r/n", r.URL.Path)
+	// r.URL.Path = /pingqs or /pingprod
 	fmt.Printf("Len=%d", len(param))
 	par := ""
 	if len(param) == 2 {
 		par = param[1]
 	}
-	//if par == "" {
-	//	par = "pingprod"
-	//}
-	fmt.Printf("p=%s /r/n", par)
-
+	//
 	if strings.Contains(par, "pingprod") {
 		filePath = "./services-prod.json"
 	} else if strings.Contains(par, "pingqa") {
@@ -174,7 +172,6 @@ func PingHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Check %s for JSON typing error\r\n", filePath)
 		os.Exit(1)
 	}
-
 	pings := []Ping{} // Initialize
 	i := MyPinglists{GetHostname(), pings}
 	//
