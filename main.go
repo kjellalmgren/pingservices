@@ -29,7 +29,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// template
 var tpl *template.Template
+
+// instanciate a new logger
+var log = logrus.New()
 
 //
 //	JSON struct for configuration file
@@ -62,11 +66,7 @@ type MyPinglists struct {
 	Pings    []Ping
 }
 
-//
-// instanciate a new logger
-var log = logrus.New()
-
-//
+// init function
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 	//log.Formatter = new(logrus.JSONFormatter)
@@ -112,7 +112,7 @@ func main() {
 
 	err := http.ListenAndServe(":9000", router)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }
 
