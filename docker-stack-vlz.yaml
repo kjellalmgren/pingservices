@@ -8,5 +8,6 @@ services:
     deploy:
       placement:
         constraints: [node.role == manager]
+      replicas: 1
     ports:
       - 4000:8080

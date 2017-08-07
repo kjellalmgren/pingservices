@@ -8,7 +8,7 @@
 	win64: GOOS=windows GOARCH=amd64 go build -v
 	arm64: GOOS=linux GOARCH=arm64 go build -v
 	arm: GOOS=linux GOARCH=arm go build -v
-	exprimental: GOOS=linux GOARCH=arm64 go build -ldflags '-w -s' -a -installsuffix cgo -o pingservices
+	exprimental: GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags '-w -s' -a -installsuffix cgo -o pingservices
 	expriemntal: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -tags pingservices -ldflags '-w'
 */
 
