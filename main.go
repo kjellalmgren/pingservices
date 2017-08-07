@@ -20,13 +20,13 @@ import (
 	"html/template"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/fatih/color"
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 var tpl *template.Template
@@ -63,8 +63,23 @@ type MyPinglists struct {
 }
 
 //
+// instanciate a new logger
+var log = logrus.New()
+
+//
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	//log.Formatter = new(logrus.JSONFormatter)
+	log.Formatter = new(logrus.TextFormatter) // default
+
+	// file, err := os.OpenFile("logrus.log", os.O_CREATE|os.O_WRONLY, 0666)
+	// if err == nil {
+	// 	log.Out = file
+	// } else {
+	// 	log.Info("Failed to log to file, using default stderr")
+	// }
+
+	log.Level = logrus.DebugLevel
 }
 
 func main() {
