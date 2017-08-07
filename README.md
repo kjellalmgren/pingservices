@@ -417,11 +417,11 @@ In this section we have collected all error we encountered and it´s solutions w
 
 ## Docker service create error
 
-	$ docker service create --name=pingservices --publish=80:9000 tetracon/pingservices:2.18
+	$ docker service create --name=pingservices --publish=80:9000 tetracon/pingservices:2.19
 	
 ==ERROR==
 
-**image tetracon/pingservices:2.18 could not be accessed on a registry to record its digest. Each node will access tetracon/pingservices:2.17 independently, possibly leading to different nodes running different
+**image tetracon/pingservices:2.19 could not be accessed on a registry to record its digest. Each node will access tetracon/pingservices:2.19 independently, possibly leading to different nodes running different
 versions of the image.**
 
 This is solved by using ==**--with-registry-auth**== as a argument to docker service create
