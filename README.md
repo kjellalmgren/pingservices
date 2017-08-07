@@ -218,6 +218,7 @@ The visualizer should be run at the swarm manager, this is done with constraints
       deploy:
         placement:
           constraints: [node.role == manager]
+		replicas: 1
       ports:
         - 4000:8080
 
@@ -336,6 +337,8 @@ To setup the ping services thru docker-stack-pingservices.yaml. From docker 1.13
         image: tetracon/pingservices:2.19
         deploy:
           mode: replicated
+		  placement:
+		    constraints: [node.role == worker]
           # number of instances
           replicas: 4
           update_config:
@@ -368,7 +371,7 @@ In this section we have only collected different docker command we used in the p
 	$ docker exec -it <container_id> sh 
 
 ## docker run images
-	$ # not nessecary if you use docker-stack-pingservices.yml
+	$ # not nessecary if you use docker-stack-pingservices.yaml
 	$ docker run --publish 8443:8443 --name pingservices -t pingservices
 
 ## stop container
