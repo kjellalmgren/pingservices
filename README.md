@@ -1,6 +1,6 @@
 ## workshop:
 
-Updated: 2017-08-06
+Updated: 2017-08-07
 
 # setting up a Raspberry Pi 3 cluster using docker swarm
 
