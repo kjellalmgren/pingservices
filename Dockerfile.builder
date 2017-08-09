@@ -1,7 +1,7 @@
 # start from hypriot/rpi-alpine-scratch (nginx:alpine)
 #
 # -------------------------------------------------
-# FROM scratch
+# FROM resin/raspbian
 # MAINTAINER kjell.almgren@tetracon.se
 # -------------------------------------------------
 #
