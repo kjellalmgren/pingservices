@@ -9,7 +9,7 @@ import (
 // Timeout sets the ping timeout in milliseconds
 var TimeOut = 30 * time.Second
 
-// Ping sends a HEAD command to a given URL, returns whether the host answers 200 or not
+// PingExec sends a HEAD command to a given URL, returns whether the host answers 200 or not
 func PingExec(target string, url string) (httpcode int, err error) {
 
 	tr := &http.Transport{
