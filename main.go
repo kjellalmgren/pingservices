@@ -1,7 +1,7 @@
 /*
 	Services: pingservices
 	Author: Kjell Osse Almgren, Tetracon AB
-	Date: 2017-06-28
+	Date: 2017-08-15
 	Description: Service to check services availability in project Lagerlöf
 	Architecture:
 	win32: GOOS=windows GOARCH=386 go build -v
@@ -28,6 +28,21 @@ import (
 	"github.com/fatih/color"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+)
+
+// Banner text
+const (
+	// TETRACON banner
+	TETRACON = `
+_________    __
+|__    __|   | |
+   |  |  ___ | |_   ____  ___   ___ ___  _ __ 
+   |  | / _ \|  _| /  __|/ _ \ / __/ _ \| '_ \
+   |  | \ __/| |_  | |  | (_| | (_| (_) | | | | 
+   |__| \___| \__| |_|   \__,_|\___\___/|_| |_| 
+   version: %s
+   
+   `
 )
 
 // template
