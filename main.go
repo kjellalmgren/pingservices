@@ -1,7 +1,7 @@
 /*
 	Services: pingservices
 	Author: Kjell Osse Almgren, Tetracon AB
-	Date: 2017-08-15
+	Date: 2017-08-16
 	Description: Service to check services availability in project Lagerlöf
 	Architecture:
 	win32: GOOS=windows GOARCH=386 go build -v
