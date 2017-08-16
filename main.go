@@ -17,12 +17,15 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
+	"pingservices/version"
 	"strings"
 
 	"github.com/fatih/color"
@@ -45,11 +48,13 @@ _________    __
    `
 )
 
+//
+var (
+	vrsn bool
+)
+
 // template
 var tpl *template.Template
-
-// instanciate a new logger
-var log = logrus.New()
 
 //
 //	JSON struct for configuration file
@@ -84,6 +89,42 @@ type MyPinglists struct {
 
 // init function
 func init() {
+
+	// instanciate a new logger
+	var log = logrus.New()
+	flag.BoolVar(&vrsn, "version", false, "print version and exit")
+	flag.BoolVar(&vrsn, "v", false, "print version and exit (shorthand)")
+	flag.BoolVar(&vrsn, "s", false, "run in server mode")
+
+	flag.Usage = func() {
+		fmt.Fprint(os.Stderr, fmt.Sprintf(TETRACON, version.PingVersion()))
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+	if vrsn {
+
+		fmt.Printf("flag version %s\n", version.PingVersion())
+		os.Exit(0)
+	}
+
+	if flag.NArg() < 1 {
+		return
+	}
+
+	// parse the arg
+	arg := flag.Args()[0]
+
+	if arg == "help" {
+		usageAndExit("", 0)
+	}
+
+	if arg == "version" {
+		fmt.Printf("flag version %s\n", version.PingVersion())
+		os.Exit(0)
+	}
+
+	//
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 	//log.Formatter = new(logrus.JSONFormatter)
 	log.Formatter = new(logrus.TextFormatter) // default
@@ -116,19 +157,25 @@ func main() {
 	//
 	//	Read json configuration file
 	//
-	router := mux.NewRouter()
-	router.HandleFunc("/health-check", HealthCheckHandler).Methods("GET")
-	router.HandleFunc("/pingqa", PingHandler).Methods("GET")
-	router.HandleFunc("/pingprod", PingHandler).Methods("GET")
+	// parse the arg
+	arg := flag.Args()[0]
+	//
+	if arg == "server" {
 
-	router.PathPrefix("/images/").Handler(http.StripPrefix("/images/", http.FileServer(http.Dir("images"))))
-	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
-	router.PathPrefix("/dist/").Handler(http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
-	//http.Handle("/", router)
+		router := mux.NewRouter()
+		router.HandleFunc("/health-check", HealthCheckHandler).Methods("GET")
+		router.HandleFunc("/pingqa", PingHandler).Methods("GET")
+		router.HandleFunc("/pingprod", PingHandler).Methods("GET")
 
-	err := http.ListenAndServe(":9000", router)
-	if err != nil {
-		logrus.Fatal(err)
+		router.PathPrefix("/images/").Handler(http.StripPrefix("/images/", http.FileServer(http.Dir("images"))))
+		router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+		router.PathPrefix("/dist/").Handler(http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
+		//http.Handle("/", router)
+
+		err := http.ListenAndServe(":9000", router)
+		if err != nil {
+			logrus.Fatal(err)
+		}
 	}
 }
 
@@ -271,4 +318,15 @@ func PingHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+//
+func usageAndExit(message string, exitCode int) {
+	if message != "" {
+		fmt.Fprintf(os.Stderr, message)
+		fmt.Fprintf(os.Stderr, "\n\n")
+	}
+	flag.Usage()
+	fmt.Fprintf(os.Stderr, "\n")
+	os.Exit(exitCode)
 }
