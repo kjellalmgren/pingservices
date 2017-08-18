@@ -4,5 +4,5 @@ package version
 
 // PingVersion - version number (exported)
 func PingVersion() string {
-	return "v0.0.9"
+	return "v0.1.0"
 }

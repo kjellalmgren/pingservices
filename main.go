@@ -43,13 +43,13 @@ _________    __
    |  | / _ \|  _| /  __|/ _ \ / __/ _ \| '_ \
    |  | \ __/| |_  | |  | (_| | (_| (_) | | | | 
    |__| \___| \__| |_|   \__,_|\___\___/|_| |_| 
-   version: %s
-   
-   `
+version: %s
+`
 )
 
 //
 var (
+	srv  bool
 	vrsn bool
 )
 
@@ -93,8 +93,9 @@ func init() {
 	// instanciate a new logger
 	var log = logrus.New()
 	flag.BoolVar(&vrsn, "version", false, "print version and exit")
-	flag.BoolVar(&vrsn, "v", false, "print version and exit (shorthand)")
-	flag.BoolVar(&vrsn, "s", false, "run in server mode")
+	flag.BoolVar(&vrsn, "v\t", false, "print version and exit (shorthand)")
+	flag.BoolVar(&srv, "server", false, "run in server mode")
+	flag.BoolVar(&srv, "s\t\t", false, "run in server mode (shorthand)")
 
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, fmt.Sprintf(TETRACON, version.PingVersion()))
@@ -157,6 +158,9 @@ func main() {
 	//
 	//	Read json configuration file
 	//
+	if flag.NArg() < 1 {
+		usageAndExit("", 0)
+	}
 	// parse the arg
 	arg := flag.Args()[0]
 	//
@@ -320,7 +324,7 @@ func PingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//
+// usageAndExit
 func usageAndExit(message string, exitCode int) {
 	if message != "" {
 		fmt.Fprintf(os.Stderr, message)
