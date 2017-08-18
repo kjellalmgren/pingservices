@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"os"
 	"pingservices/version"
+	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
@@ -152,7 +153,8 @@ func main() {
 	// parse the arg
 	arg := flag.Args()[0]
 	//
-	if arg == "server" {
+	// check both possible arguments
+	if arg == "server" || arg == "s" {
 		showStartup(port)
 		router := mux.NewRouter()
 		router.HandleFunc("/health-check", HealthCheckHandler).Methods("GET")
@@ -163,11 +165,10 @@ func main() {
 		router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 		router.PathPrefix("/dist/").Handler(http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
 		//http.Handle("/", router)
-
-		err := http.ListenAndServe(":9000", router)
-		//err := http.ListenAndServe(fmt.Printf(":%d", port), router)
+		//
+		err := http.ListenAndServe(":"+strconv.Itoa(port), router)
 		if err != nil {
-			fmt.Printf("%d", router)
+			fmt.Printf("ListenAndServer Error: %s", err.Error())
 			logrus.Fatal(err)
 		}
 	}
