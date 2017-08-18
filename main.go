@@ -144,18 +144,6 @@ func main() {
 
 	port := 9000
 	//
-	color.Set(color.FgHiGreen)
-	fmt.Printf("Lagerlöf availability services is started on server: ")
-	color.Set(color.FgHiWhite)
-	fmt.Printf("%s", GetHostname())
-	color.Set(color.FgHiGreen)
-	fmt.Printf(" is listen on port ")
-	color.Set(color.FgHiWhite)
-	fmt.Printf("%d", port)
-	color.Set(color.FgHiGreen)
-	fmt.Println(" tls")
-	color.Unset()
-	//
 	//	Read json configuration file
 	//
 	if flag.NArg() < 1 {
@@ -165,7 +153,7 @@ func main() {
 	arg := flag.Args()[0]
 	//
 	if arg == "server" {
-
+		showStartup(port)
 		router := mux.NewRouter()
 		router.HandleFunc("/health-check", HealthCheckHandler).Methods("GET")
 		router.HandleFunc("/pingqa", PingHandler).Methods("GET")
@@ -333,4 +321,19 @@ func usageAndExit(message string, exitCode int) {
 	flag.Usage()
 	fmt.Fprintf(os.Stderr, "\n")
 	os.Exit(exitCode)
+}
+
+//
+func showStartup(port int) {
+	color.Set(color.FgHiGreen)
+	fmt.Printf("Lagerlöf availability services is started on server: ")
+	color.Set(color.FgHiWhite)
+	fmt.Printf("%s", GetHostname())
+	color.Set(color.FgHiGreen)
+	fmt.Printf(" is listen on port ")
+	color.Set(color.FgHiWhite)
+	fmt.Printf("%d", port)
+	color.Set(color.FgHiGreen)
+	fmt.Println(" tls")
+	color.Unset()
 }
