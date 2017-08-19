@@ -1,4 +1,23 @@
+sudo: required
+
 language: go
+
+go:
+  - 1.8.x
+  - master
+
+services:
+  - docker
+
+before_install:
+  - docker build -f Dockerfile.builder -t tetracon/pingservices:2.20 .
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push tetracon/pingservices:2.20;
+    fi
+
 script:
   go run main.go &
   sleep 1 &&
