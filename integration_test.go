@@ -13,11 +13,13 @@ func TestIntegration(t *testing.T) {
 	if port == "" {
 		port = "9000"
 	}
-
+	fmt.Println("** Start test integration...")
 	resp, err := http.Get("https://httpbin.org/status/418")
 	if err != nil || resp.StatusCode != 418 {
 		fmt.Printf("Failed with status 418 resp %v error %v \n", resp, err)
 		t.Fail()
+	} else {
+		fmt.Println("** Test Successfully executed...")
 	}
 	//
 	//resp1, err1 := http.Get("http://localhost:9000/pingqa")
