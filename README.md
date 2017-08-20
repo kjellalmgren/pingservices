@@ -226,7 +226,7 @@ The visualizer should be run at the swarm manager, this is done with constraints
 
 To setup the vlz services thru docker-stack-vlz.yaml. From docker 1.13 it's possibly to use .yaml files with docker stack command.
 
-		$ docker stack deploy -f docker-stack-vlz.yaml vlz --with-registry-auth
+		$ docker stack deploy -c docker-stack-vlz.yaml vlz --with-registry-auth
 
 this "docker service create .. can be skipped if you use docker-stack-vlz.yaml from above -->
 
