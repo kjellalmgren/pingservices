@@ -372,7 +372,7 @@ In this section we have only collected different docker command we used in the p
 
 ## docker run images
 	$ # not nessecary if you use docker-stack-pingservices.yaml
-	$ docker run --publish 8443:8443 --name pingservices -t pingservices
+	$ docker run --publish 9000:9000 --name pingservices -t tetracon/pingservices:2.20
 
 ## stop container
 	$ docker stop <CONTAINER ID>

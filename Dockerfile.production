@@ -9,4 +9,4 @@ COPY pingservices pingservices
 EXPOSE 9000 
 
 # run it!
-CMD ["./pingservices"] 
+CMD ["./pingservices server"] 

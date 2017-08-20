@@ -54,6 +54,10 @@ var (
 	vrsn bool
 )
 
+var (
+	arg string
+)
+
 // template
 var tpl *template.Template
 
@@ -95,8 +99,8 @@ func init() {
 	var log = logrus.New()
 	flag.BoolVar(&vrsn, "version", false, "print version and exit")
 	flag.BoolVar(&vrsn, "v", false, "print version and exit (shorthand)")
-	flag.BoolVar(&srv, "server", false, "run in server mode")
-	flag.BoolVar(&srv, "s", false, "run in server mode (shorthand)")
+	flag.BoolVar(&srv, "server", true, "run in server mode")
+	flag.BoolVar(&srv, "s", true, "run in server mode (shorthand)")
 
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, fmt.Sprintf(TETRACON, version.PingVersion()))
@@ -110,12 +114,9 @@ func init() {
 		os.Exit(0)
 	}
 
-	if flag.NArg() < 1 {
-		return
+	if flag.NArg() > 0 {
+		arg = flag.Args()[0]
 	}
-
-	// parse the arg
-	arg := flag.Args()[0]
 
 	if arg == "help" {
 		usageAndExit("", 0)
@@ -147,14 +148,11 @@ func main() {
 	//
 	//	Read json configuration file
 	//
-	if flag.NArg() < 1 {
-		usageAndExit("", 0)
-	}
 	// parse the arg
-	arg := flag.Args()[0]
+	//arg := flag.Args()[0]
 	//
 	// check both possible arguments
-	if arg == "server" || arg == "s" {
+	if flag.NArg() < 1 {
 		showStartup(port)
 		router := mux.NewRouter()
 		router.HandleFunc("/health-check", HealthCheckHandler).Methods("GET")

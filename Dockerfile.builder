@@ -60,5 +60,6 @@ COPY pingservices /pingservices
 EXPOSE 9000
 
 # run it!
-CMD ["./pingservices"]
-#ENTRYPOINT ["/pingservices"]
+
+ENTRYPOINT ["./pingservices"]
+#CMD ["./pingservices"]
