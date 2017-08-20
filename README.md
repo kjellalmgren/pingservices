@@ -51,7 +51,7 @@ As you can se in the picture above, hypriotOS 64bit comes with docker 1.13.1 pre
 To be able to execute our go program in the container based on resin/rpi-raspbian we have to compile for the right target environment. In this case we will set GOOS=linux and GOARCH=arm64.
 
 	# We need to compile for 64-bits armv8
-	$ GOOS=linux GOARCH=arm64 go build -v
+	$ CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -tags pingservices -ldflags '-w'
 
 	$ file pingservices
 
