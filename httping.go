@@ -13,8 +13,8 @@ var TimeOut = 30 * time.Second
 func PingExec(target string, url string) (httpcode int, err error) {
 
 	tr := &http.Transport{
-		MaxIdleConns:       10,
-		IdleConnTimeout:    30 * time.Second,
+		MaxIdleConns:       20,
+		IdleConnTimeout:    20 * time.Second,
 		DisableCompression: true,
 	}
 
