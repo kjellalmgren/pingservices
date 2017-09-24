@@ -154,6 +154,7 @@ func main() {
 	// check both possible arguments
 	if flag.NArg() < 1 {
 		showStartup(port)
+		color.Unset()
 		router := mux.NewRouter()
 		router.HandleFunc("/health-check", HealthCheckHandler).Methods("GET")
 		router.HandleFunc("/pingqa", PingHandler).Methods("GET")
@@ -324,7 +325,7 @@ func usageAndExit(message string, exitCode int) {
 	os.Exit(exitCode)
 }
 
-//
+// showStartup
 func showStartup(port int) {
 	color.Set(color.FgHiGreen)
 	fmt.Printf("Lagerlöf availability services is started on server: ")
