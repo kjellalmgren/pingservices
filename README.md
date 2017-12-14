@@ -292,6 +292,8 @@ See the *docker-stack-pingservices.yaml* file bellow, the .yaml file describe wi
 
 The **--with-registry-auth** argument to docker is nescessary for docker to be able to instantiate each container somewhere in the cluster. See error section for more description from @thaJeztah.
 
+The **--no-resolve-images** argument to docker is nescessary for docker not to verify platform check, ut´s a bug at the moment.
+
 ![RPi-Cluster](images/cluster-cli-ping.png)
 
 If everything working as expcected we should see that **pingservices_web** is running as 4 services in our cluster. Feel free to elaborate with the .yaml file to scale up and down the service. One thing to consider is that it´s not much of a deal to start more containers per machine that you have cores. Of course there will be circumstances, but in general.
