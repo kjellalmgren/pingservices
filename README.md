@@ -292,7 +292,7 @@ See the *docker-stack-pingservices.yaml* file bellow, the .yaml file describe wi
 
 The **--with-registry-auth** argument to docker is nescessary for docker to be able to instantiate each container somewhere in the cluster. See error section for more description from @thaJeztah.
 
-The **--no-resolve-images** argument to docker is nescessary for docker not to verify platform check, ut´s a bug at the moment.
+The **--no-resolve-image** argument to docker is nescessary for docker not to verify platform check, ut´s a bug at the moment.
 
 ![RPi-Cluster](images/cluster-cli-ping.png)
 
