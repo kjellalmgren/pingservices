@@ -1,4 +1,9 @@
 ## workshop:
+Updated: 2017-12-10
+
+	$ docker service create --publish 80:9000 --name pingservices --replicas=2 --constraint node.role==worker --no-resolve-image --with-registry-auth tetracon/pingservices:2.25
+	
+	https://github.com/docker/swarmkit/issues/2294
 
 Updated: 2017-08-07
 

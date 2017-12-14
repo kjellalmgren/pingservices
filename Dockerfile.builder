@@ -2,12 +2,11 @@
 #
 # -------------------------------------------------
 # FROM resin/rpi-raspbian
-# FROM nginx:alpine for linux container
+# FROM nginx:alpine # for linux container
 # MAINTAINER kjell.almgren@tetracon.se
 # -------------------------------------------------
 #
 FROM resin/rpi-raspbian
-
 MAINTAINER kjell.almgren@tetracon.se
 
 # make some update to the OS in the container

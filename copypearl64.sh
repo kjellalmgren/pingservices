@@ -8,3 +8,9 @@ scp -rp ~/Documents/gorep/src/pingservices/services-qa.json pirate@black-pearl64
 scp -rp ~/Documents/gorep/src/pingservices/pingservices pirate@black-pearl64.local:pingservices/pingservices
 scp -rp ~/Documents/gorep/src/pingservices/docker-stack-pingservices.yaml pirate@black-pearl64.local:docker-stack-pingservices.yaml
 scp -rp ~/Documents/gorep/src/pingservices/docker-stack-vlz.yaml pirate@black-pearl64.local:docker-stack-vlz.yaml
+
+scp -rp ~/Documents/gorep/src/pingservices/docker-stack-pingservices.yaml pirate@black-pearl64m.local:docker-stack-pingservices.yaml
+scp -rp ~/Documents/gorep/src/pingservices/docker-stack-vlz.yaml pirate@black-pearl64m.local:docker-stack-vlz.yaml
+
+scp -rp ~/Documents/gorep/src/pingservices/pingservices pirate@black-pearl64m.local:pingservices
+scp -rp ~/Documents/gorep/src/ping1/ping1 pirate@black-pearl64m.local:ping1
