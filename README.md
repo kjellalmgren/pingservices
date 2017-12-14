@@ -286,7 +286,7 @@ To be able to start *tetracon/pingservices:2.19* we have to make sure that we ha
 
 See the *docker-stack-pingservices.yaml* file bellow, the .yaml file describe wich image, how many replicas and some resource limit posibillities you have. It´s also doing some port mapping and set restart-policies.
 
-	$ docker stack deploy -c docker-stack-pingservices.yaml pingservices --with-registry-auth
+	$ docker stack deploy -c docker-stack-pingservices.yaml pingservices --with-registry-auth --no-resolve-image
 	# Creating network pingservices_webnet
 	# Creating service pingservices_web
 
