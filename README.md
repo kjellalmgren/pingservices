@@ -292,7 +292,7 @@ See the *docker-stack-pingservices.yaml* file bellow, the .yaml file describe wi
 
 The **--with-registry-auth** argument to docker is nescessary for docker to be able to instantiate each container somewhere in the cluster. See error section for more description from @thaJeztah.
 
-The **--no-resolve-image** argument to docker is nescessary for docker not to verify platform check, ut´s a bug at the moment.
+The **--no-resolve-image** argument to docker is nescessary for docker not to verify platform check, it´s a bug at the moment in docker.
 
 ![RPi-Cluster](images/cluster-cli-ping.png)
 
@@ -327,7 +327,7 @@ Following config participant in CD pipeline
 
 Yuo can for example build a new image and change docker-stack.yaml with the new image tag and just execute docker stack deploy... again.
 
-    $ docker stack deploy -c docker-stack-pingservices.yaml pingservices --with-registry-auth
+    $ docker stack deploy -c docker-stack-pingservices.yaml pingservices --with-registry-auth --resolve-image=never
     # docker will replay by : **Updating service pingservices_web (id: pb8q4bklshk1uyf22i2fil1ld)**
 
 
@@ -433,7 +433,7 @@ versions of the image.**
 
 This is solved by using ==**--with-registry-auth**== as a argument to docker service create
 
-	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth
+	$ docker stack deploy -c docker-compose.yaml pingservices --with-registry-auth --resolve-image=never
 	
 **Explained by @thaJeztah at github**
 
